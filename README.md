@@ -3,8 +3,9 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 
 A [Gnuboard7](https://sir.kr/) plugin that provides JSON data sources for home-page
-widgets built on `sirsoft-board` — a **site-wide recent posts** feed and a
-**site-wide popular posts** feed, both with the post's **category** included.
+widgets built on `sirsoft-board` — a **site-wide recent posts** feed, a
+**site-wide popular posts** feed (both with the post's **category** included), and a
+**notice ticker** feed for a single board.
 
 `sirsoft-board` itself is not modified. The plugin queries the core `Post` / `Board`
 models from its own API routes and applies per-board read permissions at response
@@ -29,9 +30,15 @@ time, so it can add fields (such as `category`) that the core home APIs do not r
   - Fields: `id`, `board_slug`, `board_name`, `title`, `category`, `view_count`,
     `comment_count`, `created_at`, `created_at_formatted`.
   - **No author fields** — author name, e-mail and avatar are never queried.
-- **Permission-safe caching** (both endpoints)
+- **Notice ticker** (0.2.0+) — `GET /api/plugins/g7-home-widgets/notice-posts?board=notice&limit=5`
+  - Latest posts of one board: active board, published, not deleted, not a reply,
+    **not secret**; ordered by `created_at` desc.
+  - `board` (required): board slug. `limit`: default 5, clamped to 10.
+  - Fields: `id`, `board_slug`, `title`, `created_at`, `created_at_formatted` — **no author fields**.
+  - Missing board, invalid slug or no read permission → `data: []` (never an error).
+- **Permission-safe caching** (all endpoints)
   - A user-independent "safe pool" is cached for 90 seconds (the popular pool's
-    cache key includes the period).
+    cache key includes the period; the notice pool's key includes `board` and `limit`).
   - `sirsoft-board.{slug}.posts.read` is checked per request for the current
     user (guest or member), so a privileged user's result never leaks to others.
   - The pool is larger than `limit` (at least 50), so the list stays full after
@@ -78,7 +85,23 @@ see boards that guests cannot:
 }
 ```
 
-To switch the period without leaving the page, set the local state and refetch:
+For the notice ticker, point a data source at `notice-posts` with your notice board's slug —
+the `g7-wc-community` template renders it with its `NoticeTicker` component:
+
+```json
+{
+  "id": "home_notice_posts",
+  "type": "api",
+  "endpoint": "/api/plugins/g7-home-widgets/notice-posts",
+  "method": "GET",
+  "params": { "board": "notice", "limit": 5 },
+  "auto_fetch": true,
+  "auth_mode": "optional",
+  "fallback": { "data": [] }
+}
+```
+
+To switch the popular-posts period without leaving the page, set the local state and refetch:
 `sequence[ setState(local, homePopularPeriod) → refetchDataSource(home_popular_posts) ]`.
 
 ## Uninstalling

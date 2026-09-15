@@ -5,7 +5,7 @@ namespace Plugins\G7\Home\Widgets;
 use App\Extension\AbstractPlugin;
 
 /**
- * 홈 화면 위젯 모음 (g7-home-widgets) — "전체 최근글" 위젯, 0.1.0.
+ * 홈 화면 위젯 모음 (g7-home-widgets) — "전체 최근글"·"인기글"·"공지 티커" 위젯, 0.2.0.
  *
  * 홈 화면에 게시판 구분 없이 사이트 전체 게시글을 시간순으로 통합해 보여주는 위젯을
  * 제공한다. sirsoft-board 코어는 **파일 한 줄도 수정하지 않는다** — 이 애드온이
@@ -21,6 +21,10 @@ use App\Extension\AbstractPlugin;
  * 2026-09-14: "인기글" 위젯용 `/api/plugins/g7-home-widgets/popular-posts` 추가 — 코어
  * `boards/popular` 와 같은 정렬·필터에 `category` 를 더하고 작성자 정보는 빼는 자체 쿼리
  * ({@see Support\PopularPostsQuery}).
+ *
+ * 0.2.0: 홈 하단 "공지 티커"용 `/api/plugins/g7-home-widgets/notice-posts?board={slug}&limit=` 추가 —
+ * 지정 게시판 1곳의 최신글을 최근글과 같은 필터(+비밀글 제외)로 조회하고 제목·슬러그·ID·작성일만
+ * 돌려준다. 게시판 없음/권한 없음은 빈 배열({@see Support\NoticePostsQuery}).
  *
  * 훅 리스너·DB 테이블·설정 스키마 없음 — 순수 라우트+쿼리 애드온.
  */

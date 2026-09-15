@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Plugins\G7\Home\Widgets\Http\Controllers\NoticePostsController;
 use Plugins\G7\Home\Widgets\Http\Controllers\PopularPostsController;
 use Plugins\G7\Home\Widgets\Http\Controllers\RecentPostsController;
 
@@ -21,3 +22,9 @@ Route::get('recent-posts', [RecentPostsController::class, 'index'])
 Route::get('popular-posts', [PopularPostsController::class, 'index'])
     ->middleware(['optional.sanctum', 'throttle:600,1'])
     ->name('popular-posts.index');
+
+// 공지 티커(지정 게시판 1곳 최신글, 제목·슬러그·ID·작성일만) — 게시판 없음/권한 없음은 빈 배열,
+// 로그인 여부에 따라 권한 필터링 결과가 달라지므로 optional.sanctum.
+Route::get('notice-posts', [NoticePostsController::class, 'index'])
+    ->middleware(['optional.sanctum', 'throttle:600,1'])
+    ->name('notice-posts.index');
