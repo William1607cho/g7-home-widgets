@@ -1,0 +1,12 @@
+{
+    "_meta": {
+        "version": "0.3.0",
+        "description": "홈 화면 위젯 모음 환경설정 (최근글·인기글 위젯에서 제외할 게시판)"
+    },
+    "defaults": {
+        "excluded_board_ids": []
+    },
+    "frontend_schema": {
+        "excluded_board_ids": { "expose": false }
+    }
+}

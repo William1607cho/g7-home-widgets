@@ -1,0 +1,27 @@
+{
+    "editor": {
+        "data_source": {
+            "board_filter": "홈 위젯 게시판 설정"
+        }
+    },
+    "settings": {
+        "title": "홈 위젯 게시판 설정",
+        "description": "홈 화면의 최근글·인기글 위젯에 어떤 게시판의 글을 보여줄지 정합니다.",
+        "notice": "표시 여부만 정하며, 열람 권한과는 무관합니다. 공지 티커는 이 설정의 영향을 받지 않습니다.",
+        "help": "카드를 끌어 두 영역 사이로 옮기거나, 카드의 X·+ 버튼을 누르세요. 새로 만든 게시판은 자동으로 포함됩니다.",
+        "filter_placeholder": "게시판 이름으로 찾기",
+        "included_title": "포함됨",
+        "included_hint": "위젯에 글이 표시되는 게시판",
+        "excluded_title": "포함안함",
+        "excluded_hint": "위젯에 글을 표시하지 않는 게시판",
+        "empty_included": "포함된 게시판이 없습니다.",
+        "empty_excluded": "여기로 카드를 끌어 놓으면 위젯에서 제외됩니다.",
+        "no_match": "이름이 일치하는 게시판이 없습니다.",
+        "inactive": "비활성",
+        "exclude": "위젯에서 제외",
+        "include": "위젯에 포함",
+        "loading": "게시판 목록을 불러오는 중…",
+        "save_success": "저장했습니다.",
+        "save_error": "저장에 실패했습니다."
+    }
+}
