@@ -36,6 +36,24 @@ time, so it can add fields (such as `category`) that the core home APIs do not r
   - `board` (required): board slug. `limit`: default 5, clamped to 10.
   - Fields: `id`, `board_slug`, `title`, `created_at`, `created_at_formatted` — **no author fields**.
   - Missing board, invalid slug or no read permission → `data: []` (never an error).
+- **Widget board settings** (0.3.0+) — **Admin → 홈 위젯 게시판 설정 / Home Widget Boards**
+  (`/admin/plugins/g7-home-widgets/settings`)
+  - Choose which boards the recent and popular posts widgets leave out. The notice ticker is
+    not affected.
+  - All boards are shown as cards in **Included** / **Not included**. Drag a card between
+    the areas, or use its X / + button (always visible, so it works on touch screens too).
+    A name filter narrows both areas; inactive boards carry an "Inactive" badge.
+  - Dragging uses a small script loaded by the settings layout
+    (`/api/plugins/g7-home-widgets/board-filter-drag.js`). Layout JSON action handlers cancel
+    `dragstart`, so the script starts the drag and, on drop, presses the card's X / + button.
+    It sends no requests and does not touch app state.
+  - Only the IDs in **Not included** are saved, so new boards are included automatically and
+    IDs of deleted boards are dropped on the next save.
+  - **This only controls visibility and does not change read permissions.** Per-board read
+    permission is still checked for every request.
+  - Excluded boards are removed in the query, so `limit` is still filled.
+  - Admin API: `GET` / `PUT /api/plugins/g7-home-widgets/admin/board-filter`
+    (`core.plugins.read` / `core.plugins.update`), body `{ "excluded_board_ids": [1, 2] }`.
 - **Permission-safe caching** (all endpoints)
   - A user-independent "safe pool" is cached for 90 seconds (the popular pool's
     cache key includes the period; the notice pool's key includes `board` and `limit`).
@@ -43,6 +61,8 @@ time, so it can add fields (such as `category`) that the core home APIs do not r
     user (guest or member), so a privileged user's result never leaks to others.
   - The pool is larger than `limit` (at least 50), so the list stays full after
     permission filtering.
+  - The recent/popular pool keys also include a fingerprint of the excluded-board list;
+    saving the settings clears the pools cached under the previous list.
 
 ## Requirements
 
@@ -58,6 +78,9 @@ php artisan plugin:activate g7-home-widgets
 ```
 
 Or install and activate it from **Admin → Plugins**.
+
+If the settings screen does not appear after updating from an earlier version, refresh the
+plugin layouts: `php artisan plugin:refresh-layout g7-home-widgets`.
 
 If the routes do not appear and your site caches routes, clear and rebuild the cache:
 
@@ -106,8 +129,9 @@ To switch the popular-posts period without leaving the page, set the local state
 
 ## Uninstalling
 
-The plugin has no database tables, settings or hook listeners. Deactivate and uninstall
-it from **Admin → Plugins** (or `php artisan plugin:uninstall g7-home-widgets`), and
+The plugin has no database tables or hook listeners; its only setting
+(`excluded_board_ids`) is stored in the plugin settings file. Deactivate and uninstall it
+from **Admin → Plugins** (or `php artisan plugin:uninstall g7-home-widgets`), and
 remove any data sources that point at its endpoints from your templates.
 
 ## License

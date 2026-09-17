@@ -5,6 +5,44 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2026-09-17
+
+### Added
+
+- **Widget board settings** — an admin screen at `/admin/plugins/g7-home-widgets/settings`
+  (sidebar: "홈 위젯 게시판 설정" / "Home Widget Boards") to choose which boards the
+  **recent posts** and **popular posts** widgets leave out. The notice ticker is not affected
+  (it already names its board).
+  - Every existing board is shown as a card in one of two areas — **Included** and
+    **Not included** (cards wrap in rows). Move a card by dragging it between the areas or
+    with its X / + button (always visible, so it also works on touch screens); a name filter
+    narrows both areas. Inactive boards are shown with an "Inactive" badge.
+  - Dragging is handled by a small script the settings layout loads
+    (`GET /api/plugins/g7-home-widgets/board-filter-drag.js`, public, cached). Layout JSON
+    action handlers cancel `dragstart`, so the script starts the drag natively and, when a
+    card is dropped on the other area, presses that card's X / + button — the same move logic
+    as a click. It makes no network requests and does not touch app state or storage.
+  - Only the IDs in **Not included** are saved (`excluded_board_ids` plugin setting).
+    New boards are therefore included automatically; IDs of deleted boards are ignored and
+    dropped on the next save.
+  - The setting only controls visibility. It does **not** change read permissions — per-board
+    `sirsoft-board.{slug}.posts.read` filtering still applies to every request.
+- `GET /api/plugins/g7-home-widgets/admin/board-filter` (`core.plugins.read`) and
+  `PUT` on the same path (`core.plugins.update`), both returning
+  `{ boards: [{id, name, slug, is_active}], excluded_board_ids: [...] }`.
+  - `PUT` body: `{ "excluded_board_ids": [int, ...] }` — an array (may be empty) of up to 500
+    integers ≥ 1. Duplicates and IDs of boards that do not exist are removed before saving;
+    other input is rejected with 422.
+- `github_url` in `plugin.json`, so the admin update check can find this repository.
+
+### Changed
+
+- Recent and popular posts now drop excluded boards **in the query** (before the pool is
+  cut), so the requested `limit` is still filled. Request and response formats are unchanged.
+- The pool cache keys include a short fingerprint of the excluded-board list, so a saved
+  change takes effect immediately; saving also clears every pool cached under the previous
+  list (recent: all pool sizes; popular: all four periods × all pool sizes).
+
 ## [0.2.0] - 2026-09-15
 
 ### Added
