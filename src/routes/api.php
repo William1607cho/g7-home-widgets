@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Plugins\G7\Home\Widgets\Http\Controllers\Admin\BoardFilterAdminController;
 use Plugins\G7\Home\Widgets\Http\Controllers\NoticePostsController;
 use Plugins\G7\Home\Widgets\Http\Controllers\PopularPostsController;
 use Plugins\G7\Home\Widgets\Http\Controllers\RecentPostsController;
@@ -28,3 +29,15 @@ Route::get('popular-posts', [PopularPostsController::class, 'index'])
 Route::get('notice-posts', [NoticePostsController::class, 'index'])
     ->middleware(['optional.sanctum', 'throttle:600,1'])
     ->name('notice-posts.index');
+
+// 위젯 게시판 제외 설정(관리자, 0.3.0) — 최근글·인기글에서 뺄 게시판 ID 목록.
+// 조회는 코어 플러그인 조회 권한, 저장은 코어 플러그인 수정 권한(g7-webzine-addon 과 동일 표기).
+Route::prefix('admin')->name('admin.')->middleware('auth:sanctum')->group(function () {
+    Route::get('board-filter', [BoardFilterAdminController::class, 'show'])
+        ->middleware('permission:admin,core.plugins.read')
+        ->name('board-filter.show');
+
+    Route::put('board-filter', [BoardFilterAdminController::class, 'update'])
+        ->middleware('permission:admin,core.plugins.update')
+        ->name('board-filter.update');
+});
