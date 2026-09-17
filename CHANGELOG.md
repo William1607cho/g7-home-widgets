@@ -14,8 +14,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   **recent posts** and **popular posts** widgets leave out. The notice ticker is not affected
   (it already names its board).
   - Every existing board is shown as a card in one of two areas — **Included** and
-    **Not included**. Move a card by dragging it between the areas or with its X / + button;
-    a name filter narrows both areas. Inactive boards are shown with an "Inactive" badge.
+    **Not included** (cards wrap in rows). Move a card by dragging it between the areas or
+    with its X / + button (always visible, so it also works on touch screens); a name filter
+    narrows both areas. Inactive boards are shown with an "Inactive" badge.
+  - Dragging is handled by a small script the settings layout loads
+    (`GET /api/plugins/g7-home-widgets/board-filter-drag.js`, public, cached). Layout JSON
+    action handlers cancel `dragstart`, so the script starts the drag natively and, when a
+    card is dropped on the other area, presses that card's X / + button — the same move logic
+    as a click. It makes no network requests and does not touch app state or storage.
   - Only the IDs in **Not included** are saved (`excluded_board_ids` plugin setting).
     New boards are therefore included automatically; IDs of deleted boards are ignored and
     dropped on the next save.

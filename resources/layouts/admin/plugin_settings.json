@@ -5,6 +5,13 @@
         "core.plugins.read"
     ],
     "extends": "_admin_base",
+    "scripts": [
+        {
+            "src": "/api/plugins/g7-home-widgets/board-filter-drag.js?v=0.3.0",
+            "id": "g7_home_widgets_board_filter_drag",
+            "async": true
+        }
+    ],
     "meta": {
         "title": "$t:g7-home-widgets.settings.title",
         "description": "$t:g7-home-widgets.settings.description"
@@ -26,9 +33,7 @@
                         "target": "local",
                         "excluded": "{{response.data.data.excluded_board_ids ?? []}}",
                         "included": "{{(response.data.data.boards ?? []).map(b => b.id).filter(id => !(response.data.data.excluded_board_ids ?? []).includes(id))}}",
-                        "dirty": false,
-                        "dragId": null,
-                        "dragFrom": null
+                        "dirty": false
                     }
                 }
             ]
@@ -191,20 +196,6 @@
                                             "data-zone-drop": "included",
                                             "className": "rounded-lg border-2 border-dashed p-4 min-h-24 border-blue-200 dark:border-blue-900/60"
                                         },
-                                        "actions": [
-                                            {
-                                                "type": "drop",
-                                                "handler": "setState",
-                                                "params": {
-                                                    "target": "local",
-                                                    "excluded": "{{_local.dragFrom === 'excluded' ? (_local.excluded ?? []).filter(id => id !== _local.dragId) : _local.excluded}}",
-                                                    "included": "{{_local.dragFrom === 'excluded' ? ((_local.included ?? []).includes(_local.dragId) ? (_local.included ?? []) : [...(_local.included ?? []), _local.dragId]) : _local.included}}",
-                                                    "dirty": "{{_local.dragFrom === 'excluded' ? true : _local.dirty}}",
-                                                    "dragId": null,
-                                                    "dragFrom": null
-                                                }
-                                            }
-                                        ],
                                         "children": [
                                             {
                                                 "type": "basic",
@@ -259,26 +250,6 @@
                                                             "data-zone": "included",
                                                             "className": "group flex items-center gap-2 pl-3 pr-1 py-1.5 rounded-lg border cursor-grab select-none bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
                                                         },
-                                                        "actions": [
-                                                            {
-                                                                "type": "dragstart",
-                                                                "handler": "setState",
-                                                                "params": {
-                                                                    "target": "local",
-                                                                    "dragId": "{{Number(board.id)}}",
-                                                                    "dragFrom": "included"
-                                                                }
-                                                            },
-                                                            {
-                                                                "type": "dragend",
-                                                                "handler": "setState",
-                                                                "params": {
-                                                                    "target": "local",
-                                                                    "dragId": null,
-                                                                    "dragFrom": null
-                                                                }
-                                                            }
-                                                        ],
                                                         "children": [
                                                             {
                                                                 "type": "basic",
@@ -379,20 +350,6 @@
                                             "data-zone-drop": "excluded",
                                             "className": "rounded-lg border-2 border-dashed p-4 min-h-24 border-gray-300 dark:border-gray-600 bg-gray-50/50 dark:bg-gray-900/30"
                                         },
-                                        "actions": [
-                                            {
-                                                "type": "drop",
-                                                "handler": "setState",
-                                                "params": {
-                                                    "target": "local",
-                                                    "included": "{{_local.dragFrom === 'included' ? (_local.included ?? []).filter(id => id !== _local.dragId) : _local.included}}",
-                                                    "excluded": "{{_local.dragFrom === 'included' ? ((_local.excluded ?? []).includes(_local.dragId) ? (_local.excluded ?? []) : [...(_local.excluded ?? []), _local.dragId]) : _local.excluded}}",
-                                                    "dirty": "{{_local.dragFrom === 'included' ? true : _local.dirty}}",
-                                                    "dragId": null,
-                                                    "dragFrom": null
-                                                }
-                                            }
-                                        ],
                                         "children": [
                                             {
                                                 "type": "basic",
@@ -447,26 +404,6 @@
                                                             "data-zone": "excluded",
                                                             "className": "group flex items-center gap-2 pl-3 pr-1 py-1.5 rounded-lg border cursor-grab select-none bg-gray-50 dark:bg-gray-900/50 border-dashed border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400"
                                                         },
-                                                        "actions": [
-                                                            {
-                                                                "type": "dragstart",
-                                                                "handler": "setState",
-                                                                "params": {
-                                                                    "target": "local",
-                                                                    "dragId": "{{Number(board.id)}}",
-                                                                    "dragFrom": "excluded"
-                                                                }
-                                                            },
-                                                            {
-                                                                "type": "dragend",
-                                                                "handler": "setState",
-                                                                "params": {
-                                                                    "target": "local",
-                                                                    "dragId": null,
-                                                                    "dragFrom": null
-                                                                }
-                                                            }
-                                                        ],
                                                         "children": [
                                                             {
                                                                 "type": "basic",

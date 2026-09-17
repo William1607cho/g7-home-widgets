@@ -43,6 +43,10 @@ time, so it can add fields (such as `category`) that the core home APIs do not r
   - All boards are shown as cards in **Included** / **Not included**. Drag a card between
     the areas, or use its X / + button (always visible, so it works on touch screens too).
     A name filter narrows both areas; inactive boards carry an "Inactive" badge.
+  - Dragging uses a small script loaded by the settings layout
+    (`/api/plugins/g7-home-widgets/board-filter-drag.js`). Layout JSON action handlers cancel
+    `dragstart`, so the script starts the drag and, on drop, presses the card's X / + button.
+    It sends no requests and does not touch app state.
   - Only the IDs in **Not included** are saved, so new boards are included automatically and
     IDs of deleted boards are dropped on the next save.
   - **This only controls visibility and does not change read permissions.** Per-board read
