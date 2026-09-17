@@ -245,14 +245,14 @@
                                                 "props": {
                                                     "className": "flex flex-wrap gap-2"
                                                 },
-                                                "iteration": {
-                                                    "source": "(boardFilter?.data?.boards ?? []).filter(b => (_local.included ?? []).includes(b.id) && (!_local.q || String(b.name ?? '').toLowerCase().includes(String(_local.q).trim().toLowerCase())))",
-                                                    "item_var": "board"
-                                                },
                                                 "children": [
                                                     {
                                                         "type": "basic",
                                                         "name": "Div",
+                                                        "iteration": {
+                                                            "source": "(boardFilter?.data?.boards ?? []).filter(b => (_local.included ?? []).includes(b.id) && (!_local.q || String(b.name ?? '').toLowerCase().includes(String(_local.q).trim().toLowerCase())))",
+                                                            "item_var": "board"
+                                                        },
                                                         "props": {
                                                             "draggable": true,
                                                             "data-board-card": "{{board.id}}",
@@ -433,14 +433,14 @@
                                                 "props": {
                                                     "className": "flex flex-wrap gap-2"
                                                 },
-                                                "iteration": {
-                                                    "source": "(boardFilter?.data?.boards ?? []).filter(b => (_local.excluded ?? []).includes(b.id) && (!_local.q || String(b.name ?? '').toLowerCase().includes(String(_local.q).trim().toLowerCase())))",
-                                                    "item_var": "board"
-                                                },
                                                 "children": [
                                                     {
                                                         "type": "basic",
                                                         "name": "Div",
+                                                        "iteration": {
+                                                            "source": "(boardFilter?.data?.boards ?? []).filter(b => (_local.excluded ?? []).includes(b.id) && (!_local.q || String(b.name ?? '').toLowerCase().includes(String(_local.q).trim().toLowerCase())))",
+                                                            "item_var": "board"
+                                                        },
                                                         "props": {
                                                             "draggable": true,
                                                             "data-board-card": "{{board.id}}",
