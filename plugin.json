@@ -5,7 +5,7 @@
         "ko": "홈 화면 위젯 모음",
         "en": "Home Page Widgets"
     },
-    "version": "0.2.0",
+    "version": "0.3.0",
     "license": "MIT",
     "description": {
         "ko": "홈 화면에 게시판 구분 없이 사이트 전체 게시글을 시간순으로 통합해 보여주는 \"전체 최근글\" 위젯을 제공하는 애드온입니다. sirsoft-board 코어는 전혀 수정하지 않으며, 코어 모델(Post/Board)을 애드온 자체 쿼리로 직접 조회하고 게시판별 읽기 권한을 응답 시점에 필터링합니다.",
@@ -16,5 +16,6 @@
         "modules": {
             "sirsoft-board": ">=1.1.2"
         }
-    }
+    },
+    "github_url": "https://github.com/William1607cho/g7-home-widgets"
 }
