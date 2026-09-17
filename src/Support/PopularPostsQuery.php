@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Cache;
 use Modules\Sirsoft\Board\Models\Board;
 use Modules\Sirsoft\Board\Models\Post;
 use Modules\Sirsoft\Board\Traits\FormatsBoardDate;
+use Plugins\G7\Home\Widgets\Http\Requests\PopularPostsRequest;
 
 /**
  * 게시판 무관 "인기글" 통합 조회 (카테고리 포함).
@@ -31,6 +32,8 @@ use Modules\Sirsoft\Board\Traits\FormatsBoardDate;
  *    요청 limit 만큼 남도록 풀을 limit 보다 크게 잡는다(코어는 limit 만큼만 뽑은 뒤 필터링해
  *    권한 없는 글이 섞이면 limit 보다 적게 돌려준다). 정렬 기준이 같으므로 필터링 결과의 앞
  *    limit 건은 코어 결과와 순서가 같다.
+ * ⑤ 0.3.0: 관리자가 고른 제외 게시판({@see BoardFilterSettings})을 안전집합 조회 단계에서 뺀다.
+ *    캐시 키에는 제외 목록 지문이 들어간다.
  */
 class PopularPostsQuery
 {
@@ -51,8 +54,8 @@ class PopularPostsQuery
      */
     public function forCurrentUser(string $period, int $limit): array
     {
-        $poolLimit = max(self::MIN_POOL_SIZE, $limit * 5);
-        $pool = $this->cachedSafePool($period, $poolLimit);
+        $poolLimit = self::poolSizeFor($limit);
+        $pool = $this->cachedSafePool($period, $poolLimit, BoardFilterSettings::excludedIds());
 
         $user = Auth::user();
 
@@ -61,6 +64,46 @@ class PopularPostsQuery
             ->take($limit)
             ->values()
             ->all();
+    }
+
+    /**
+     * 요청 limit 에 대한 안전집합 풀 크기.
+     *
+     * @param  int  $limit  요청 limit
+     */
+    private static function poolSizeFor(int $limit): int
+    {
+        return max(self::MIN_POOL_SIZE, $limit * 5);
+    }
+
+    /**
+     * 안전집합 캐시 키.
+     *
+     * @param  string  $period  기간 키
+     * @param  string  $fingerprint  제외 목록 지문
+     * @param  int  $poolLimit  풀 크기
+     */
+    private static function cacheKey(string $period, string $fingerprint, int $poolLimit): string
+    {
+        return "g7_home_widgets_popular_posts_pool_{$period}_{$fingerprint}_{$poolLimit}";
+    }
+
+    /**
+     * 지정한 지문으로 만들어질 수 있는 캐시 키 전체 (기간 4종 × limit 0 ~ 상한).
+     *
+     * @param  string  $fingerprint  제외 목록 지문
+     * @return array<int, string>
+     */
+    public static function cacheKeysFor(string $fingerprint): array
+    {
+        $keys = [];
+        foreach (PopularPostsRequest::RESOLVED_PERIODS as $period) {
+            for ($limit = 0; $limit <= PopularPostsRequest::MAX_LIMIT; $limit++) {
+                $keys[] = self::cacheKey($period, $fingerprint, self::poolSizeFor($limit));
+            }
+        }
+
+        return array_values(array_unique($keys));
     }
 
     /**
@@ -85,14 +128,15 @@ class PopularPostsQuery
      *
      * @param  string  $period  기간 키
      * @param  int  $poolLimit  풀 크기
+     * @param  array<int, int>  $excludedBoardIds  제외 게시판 ID (정리된 목록)
      * @return array<int, array<string, mixed>>
      */
-    private function cachedSafePool(string $period, int $poolLimit): array
+    private function cachedSafePool(string $period, int $poolLimit, array $excludedBoardIds): array
     {
         return Cache::remember(
-            "g7_home_widgets_popular_posts_pool_{$period}_{$poolLimit}",
+            self::cacheKey($period, BoardFilterSettings::fingerprint($excludedBoardIds), $poolLimit),
             self::CACHE_TTL_SECONDS,
-            fn () => $this->querySafePool($period, $poolLimit)
+            fn () => $this->querySafePool($period, $poolLimit, $excludedBoardIds)
         );
     }
 
@@ -102,12 +146,15 @@ class PopularPostsQuery
      *
      * @param  string  $period  기간 키
      * @param  int  $limit  풀 크기
+     * @param  array<int, int>  $excludedBoardIds  제외 게시판 ID
      * @return array<int, array<string, mixed>>
      */
-    private function querySafePool(string $period, int $limit): array
+    private function querySafePool(string $period, int $limit, array $excludedBoardIds = []): array
     {
         // audit:allow query-unbounded-get reason: boards 는 운영자 등록 설정성 테이블 — 행 수가 운영자 행위에 묶여 데이터 증가에 비례하지 않는다 (코어 BoardRepository::getPopularPosts()와 동일 근거)
-        $activeBoardIds = Board::where('is_active', true)->pluck('id');
+        $activeBoardIds = Board::where('is_active', true)
+            ->when($excludedBoardIds !== [], fn ($query) => $query->whereNotIn('id', $excludedBoardIds))
+            ->pluck('id');
 
         if ($activeBoardIds->isEmpty()) {
             return [];
