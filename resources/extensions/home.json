@@ -310,7 +310,7 @@
                                                                             "handler": "setState",
                                                                             "params": {
                                                                                 "target": "local",
-                                                                                "g7hwTab.{{col.key}}": "{{p.key}}"
+                                                                                "g7hwTab": "{{({[col.key]: p.key})}}"
                                                                             }
                                                                         }
                                                                     ],
