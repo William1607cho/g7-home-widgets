@@ -5,6 +5,9 @@ namespace Plugins\G7\Home\Widgets;
 use App\Enums\ExtensionOwnerType;
 use App\Extension\AbstractPlugin;
 use App\Extension\Helpers\ExtensionMenuSyncHelper;
+use Plugins\G7\Home\Widgets\Home\HomeLayoutSettings;
+use Plugins\G7\Home\Widgets\Listeners\HomeCacheGenerationListener;
+use Plugins\G7\Home\Widgets\Listeners\SeoHomeContextListener;
 use Plugins\G7\Home\Widgets\Support\BoardFilterSettings;
 
 /**
@@ -34,7 +37,13 @@ use Plugins\G7\Home\Widgets\Support\BoardFilterSettings;
  * 플러그인 설정에 저장하고, 자체 API(`/api/plugins/g7-home-widgets/admin/board-filter`)로
  * 읽고 쓴다({@see Support\BoardFilterSettings}). 표시 여부만 정하며 열람 권한과는 무관하다.
  *
- * 훅 리스너·DB 테이블 없음 — 라우트+쿼리 애드온에 설정 1개와 관리자 화면 1개.
+ * 0.4.0: 홈 섹션(5개, 섹션마다 켜기/끄기·1단/2단)을 overlay(`resources/extensions/home.json`,
+ * `main_content` 앞쪽 주입)로 그린다. 칸 데이터는 `GET /api/plugins/g7-home-widgets/home` 한 번,
+ * 봇 화면은 `core.seo.filter_context` 필터로 같은 서비스 결과를 받는다. 설정 키 `home_layout`
+ * 이 없으면 기본값(0.3.0 홈 모양)으로 동작한다. 옛 위젯 API 3종은 그대로 둔다(템플릿이 주소를
+ * 직접 부른다).
+ *
+ * DB 테이블 없음.
  */
 class Plugin extends AbstractPlugin
 {
@@ -76,6 +85,34 @@ class Plugin extends AbstractPlugin
                 ],
                 'required' => false,
             ],
+            // 0.4.0 — 홈 섹션 구성. 객체지만 코어 스키마 타입에 객체가 없어 array 로 선언한다.
+            // 저장 파일에 없으면 HomeLayoutSettings 기본값을 쓴다(기본값에 공지 게시판 id 조회가
+            // 필요해 getConfigValues() 에는 넣지 않는다).
+            HomeLayoutSettings::KEY => [
+                'type' => 'array',
+                'label' => [
+                    'ko' => '홈 섹션 구성',
+                    'en' => 'Home Sections',
+                ],
+                'hint' => [
+                    'ko' => '홈 화면 섹션 5개의 켜기/끄기, 단 수, 칸별 위젯 설정입니다.',
+                    'en' => 'On/off, column count and per-column widget settings for the five home sections.',
+                ],
+                'required' => false,
+            ],
+        ];
+    }
+
+    /**
+     * 훅 리스너 (0.4.0) — 봇 홈 컨텍스트 주입, 위젯 데이터 캐시 세대 올리기.
+     *
+     * @return array<int, class-string>
+     */
+    public function getHookListeners(): array
+    {
+        return [
+            SeoHomeContextListener::class,
+            HomeCacheGenerationListener::class,
         ];
     }
 

@@ -5,6 +5,48 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+Development version `0.4.0` (staging only). Part 1 of the home sections rework.
+
+### Added
+
+- **Home sections** — the plugin now draws its own home-page area with five sections
+  (each on/off, one or two columns; two columns are 1:1 and stack on narrow screens). It is
+  injected into the home layout as an overlay (`resources/extensions/home.json`,
+  `main_content`, before the template's own home content) — no template files change.
+  - Widget types in this release: **recent posts**, **popular posts** (This Week / This Month /
+    1 Year tabs, switched in the browser without another request) and **news ticker** (rolls one
+    line at a time, pauses on hover or focus, stays still with `prefers-reduced-motion`).
+  - Default layout = the current home: section 1 two columns (recent · popular), section 2 one
+    column (ticker on the `notice` board), sections 3–5 off. Default titles and icons are the
+    same as the template widgets (Recent Posts · clock, Popular Posts · fire, Notice · bullhorn).
+  - Settings key `home_layout` (plugin settings file). When it is absent the defaults above are
+    used; nothing is written on update. There is no admin screen for it yet.
+- `GET /api/plugins/g7-home-widgets/home` (public, `optional.sanctum`) — all enabled sections
+  and their lists in one response.
+- Search-engine (bot) pages get the same data through the `core.seo.filter_context` filter, so
+  the sections render server-side too (the ticker as a static list).
+- Plugin CSS (`dist/css/plugin.css`) and JS (`dist/js/plugin.iife.js`, ticker handler
+  `g7-home-widgets.ticker`) through the core extension bundles.
+
+### Changed
+
+- Which boards a widget shows = the boards the viewer can read (decided by sirsoft-board) ∩ the
+  widget's selection − the common excluded list (`excluded_board_ids`). Read permission,
+  secret and deleted posts are still decided by sirsoft-board; popular posts come from the
+  sirsoft-board popular cache (a narrow board selection can return fewer items than the limit).
+- Widget data cache keys carry a generation number. Post create/update/delete/blind/restore,
+  board updates and saving this plugin's settings bump it, so a bot page re-rendered right after
+  a new post no longer shows the old list for the bot cache lifetime. Saving this plugin's
+  settings also clears the cached bot home page.
+
+### Unchanged
+
+- The three widget APIs used by the wc-community template (`recent-posts`, `popular-posts`,
+  `notice-posts`) and their responses. The template widgets and the new sections are both shown
+  until the template is cleaned up.
+
 ## [0.3.0] - 2026-09-17
 
 ### Added
