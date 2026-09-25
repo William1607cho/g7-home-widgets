@@ -1,0 +1,19 @@
+{
+    "type": "basic",
+    "name": "Button",
+    "props": {
+        "type": "button",
+        "className": "{{(_local.ui?.tab ?? 'layout') === '__TAB__' ? 'px-4 py-2 -mb-px text-sm font-medium border-b-2 border-blue-600 text-blue-600 dark:text-blue-400' : 'px-4 py-2 -mb-px text-sm border-b-2 border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400'}}"
+    },
+    "actions": [
+        {
+            "type": "click",
+            "handler": "setState",
+            "params": {
+                "target": "local",
+                "ui.tab": "__TAB__"
+            }
+        }
+    ],
+    "text": "$t:g7-home-widgets.home.tabs.__TAB__"
+}

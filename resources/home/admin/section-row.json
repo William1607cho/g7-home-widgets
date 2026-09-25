@@ -1,0 +1,76 @@
+{
+    "type": "basic",
+    "name": "Div",
+    "props": {
+        "className": "flex flex-wrap items-center gap-4 p-3 rounded-lg border border-gray-100 dark:border-gray-700"
+    },
+    "children": [
+        {
+            "type": "basic",
+            "name": "Span",
+            "props": {
+                "className": "w-24 text-sm font-semibold text-gray-900 dark:text-white"
+            },
+            "text": "$t:g7-home-widgets.home.tabs.s__S__"
+        },
+        {
+            "type": "basic",
+            "name": "Div",
+            "props": {
+                "className": "flex items-center gap-2"
+            },
+            "children": [
+                {
+                    "type": "basic",
+                    "name": "Input",
+                    "props": {
+                        "id": "s__S___enabled",
+                        "type": "checkbox",
+                        "name": "s__S___enabled",
+                        "className": "h-4 w-4 rounded text-blue-600"
+                    }
+                },
+                {
+                    "type": "basic",
+                    "name": "Label",
+                    "props": {
+                        "htmlFor": "s__S___enabled",
+                        "className": "text-sm text-gray-700 dark:text-gray-300"
+                    },
+                    "text": "$t:g7-home-widgets.home.layout.enabled"
+                }
+            ]
+        },
+        {
+            "type": "basic",
+            "name": "Div",
+            "props": {
+                "className": "flex items-center gap-2"
+            },
+            "children": [
+                {
+                    "type": "basic",
+                    "name": "Label",
+                    "props": {
+                        "htmlFor": "s__S___columns",
+                        "className": "text-sm text-gray-700 dark:text-gray-300"
+                    },
+                    "text": "$t:g7-home-widgets.home.layout.columns"
+                },
+                {
+                    "type": "basic",
+                    "name": "Select",
+                    "props": {
+                        "id": "s__S___columns",
+                        "name": "s__S___columns",
+                        "className": "input",
+                        "options": [
+                            { "value": 1, "label": "$t:g7-home-widgets.home.layout.one" },
+                            { "value": 2, "label": "$t:g7-home-widgets.home.layout.two" }
+                        ]
+                    }
+                }
+            ]
+        }
+    ]
+}

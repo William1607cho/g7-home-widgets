@@ -22,7 +22,15 @@ Development version `0.4.0` (staging only). Part 1 of the home sections rework.
     column (ticker on the `notice` board), sections 3–5 off. Default titles and icons are the
     same as the template widgets (Recent Posts · clock, Popular Posts · fire, Notice · bullhorn).
   - Settings key `home_layout` (plugin settings file). When it is absent the defaults above are
-    used; nothing is written on update. There is no admin screen for it yet.
+    used; nothing is written on update.
+- **Admin screen** (`/admin/plugins/g7-home-widgets/settings`, same menu entry) rebuilt with tabs:
+  **Widget Layout** (each section on/off and 1 or 2 columns; the common excluded boards editor
+  from 0.3.0 at the bottom) and **Section 1–5** (per column: widget type, number of items, and
+  boards — all boards or picked boards for recent/popular, a single board for the ticker; default
+  period tab for popular posts). Saving goes through the core plugin settings endpoint; the plugin
+  adds validation rules (a ticker with more than one board is rejected), converts the form into
+  `home_layout` before saving, and clears the widget data cache and the cached bot home page after
+  saving. New read endpoint `GET /api/plugins/g7-home-widgets/admin/home-form` (`core.plugins.read`).
 - `GET /api/plugins/g7-home-widgets/home` (public, `optional.sanctum`) — all enabled sections
   and their lists in one response.
 - Search-engine (bot) pages get the same data through the `core.seo.filter_context` filter, so

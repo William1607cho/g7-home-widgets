@@ -7,6 +7,7 @@ use App\Extension\AbstractPlugin;
 use App\Extension\Helpers\ExtensionMenuSyncHelper;
 use Plugins\G7\Home\Widgets\Home\HomeLayoutSettings;
 use Plugins\G7\Home\Widgets\Listeners\HomeCacheGenerationListener;
+use Plugins\G7\Home\Widgets\Listeners\HomeSettingsFormListener;
 use Plugins\G7\Home\Widgets\Listeners\SeoHomeContextListener;
 use Plugins\G7\Home\Widgets\Support\BoardFilterSettings;
 
@@ -113,6 +114,7 @@ class Plugin extends AbstractPlugin
         return [
             SeoHomeContextListener::class,
             HomeCacheGenerationListener::class,
+            HomeSettingsFormListener::class,
         ];
     }
 

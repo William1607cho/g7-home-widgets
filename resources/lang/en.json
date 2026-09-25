@@ -23,5 +23,50 @@
         "loading": "Loading boards…",
         "save_success": "Saved.",
         "save_error": "Failed to save."
+    },
+    "home": {
+        "title": "Home Sections",
+        "description": "Turn the five home sections on or off, choose one or two columns and pick the widget for each column.",
+        "tabs": {
+            "layout": "Widget Layout",
+            "s1": "Section 1",
+            "s2": "Section 2",
+            "s3": "Section 3",
+            "s4": "Section 4",
+            "s5": "Section 5"
+        },
+        "layout": {
+            "section": "Section",
+            "enabled": "On",
+            "columns": "Columns",
+            "one": "1 column",
+            "two": "2 columns (1:1, stacked on narrow screens)",
+            "excluded_title": "Common excluded boards",
+            "excluded_help": "Boards excluded here are not shown in recent or popular columns (the news ticker is not affected). This only controls visibility, not read permission."
+        },
+        "col": {
+            "col1": "Left column (the only one with 1 column)",
+            "col2": "Right column (only with 2 columns)",
+            "type": "Widget",
+            "limit": "Items",
+            "boards": "Boards",
+            "mode_all": "All boards",
+            "mode_only": "Selected boards only",
+            "board_pick_help": "Click to add or remove. Common excluded boards cannot be picked.",
+            "ticker_board": "Board (one)",
+            "ticker_pick": "Choose a board",
+            "period": "Default period tab",
+            "section_off": "This section is off. Turn it on in the Widget Layout tab."
+        },
+        "types": {
+            "recent": "Recent posts",
+            "popular": "Popular posts",
+            "ticker": "News ticker"
+        },
+        "periods": {
+            "week": "This Week",
+            "month": "This Month",
+            "year": "1 Year"
+        }
     }
 }

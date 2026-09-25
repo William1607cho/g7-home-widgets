@@ -21,5 +21,8 @@ return [
             'popular' => 'No popular posts',
             'ticker' => '',
         ],
+        'validation' => [
+            'ticker_single_board' => 'The news ticker can use only one board.',
+        ],
     ],
 ];

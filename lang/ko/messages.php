@@ -21,5 +21,8 @@ return [
             'popular' => '인기 게시글이 없습니다',
             'ticker' => '',
         ],
+        'validation' => [
+            'ticker_single_board' => '뉴스 티커는 게시판을 하나만 고를 수 있습니다.',
+        ],
     ],
 ];

@@ -56,6 +56,37 @@ jq --indent 4 --slurpfile frags "$work/frags.json" '
   | (.injections[0].components[0].children[0].children[0].children) |= (if . == "__WIDGETS__" then $frags[0] else error("placeholder 없음") end)
 ' "$root/resources/home/overlay.base.json" > "$work/home.json"
 
+# 관리자 설정 화면(0.4.0 2묶음): resources/home/admin/* → resources/layouts/admin/plugin_settings.json
+admin="$root/resources/home/admin"
+FILL='def fill($k; $v): walk(if type == "array" then map(if . == $k then (if ($v|type) == "array" then $v[] else $v end) else . end) elif . == $k then $v else . end);'
+stamp() { # 파일 [찾을 문자열 바꿀 문자열]... → 모든 문자열 값에서 바꾼다
+  local f=$1; shift
+  local prog='.' i=0 args=()
+  while [ $# -gt 0 ]; do
+    args+=(--arg "a$i" "$1" --arg "b$i" "$2")
+    prog="$prog | walk(if type == \"string\" then gsub(\$a$i; \$b$i) elif type == \"object\" then with_entries(.key |= gsub(\$a$i; \$b$i)) else . end)"
+    i=$((i + 1)); shift 2
+  done
+  jq "${args[@]}" "$prog" "$f"
+}
+jq -c '[.[] | {value: ., label: ("$t:g7-home-widgets.home.types." + .)}]' "$registry" > "$work/type_opts.json"
+for t in layout s1 s2 s3 s4 s5; do stamp "$admin/tab.json" __TAB__ "$t"; done | jq -s '.' > "$work/tabs.json"
+for s in 1 2 3 4 5; do stamp "$admin/section-row.json" __S__ "$s"; done | jq -s '.' > "$work/rows.json"
+: > "$work/panels.ndjson"
+for s in 1 2 3 4 5; do
+  for c in 1 2; do
+    stamp "$admin/col-panel.json" __K__ "s${s}c${c}" __S__ "$s" __C__ "$c" \
+      | jq --slurpfile o "$work/type_opts.json" "$FILL fill(\"__TYPE_OPTIONS__\"; \$o[0])"
+  done | jq -s '.' > "$work/cols.json"
+  stamp "$admin/section-panel.json" __S__ "$s" | jq --slurpfile c "$work/cols.json" "$FILL fill(\"__COLS__\"; \$c[0])" >> "$work/panels.ndjson"
+done
+jq -s '.' "$work/panels.ndjson" > "$work/panels.json"
+jq '[.. | objects | select(.id == "board_filter_panel") | .children[0].children[]]' "$admin/board_filter.v030.json" > "$work/exclusion.json"
+[ "$(jq 'length' "$work/exclusion.json")" -eq 4 ] || { echo "공통 제외 영역 노드 추출 실패" >&2; exit 2; }
+jq --indent 4 --slurpfile tabs "$work/tabs.json" --slurpfile rows "$work/rows.json" --slurpfile ex "$work/exclusion.json" --slurpfile panels "$work/panels.json" \
+  "$FILL del(._comment) | fill(\"__TABS__\"; \$tabs[0]) | fill(\"__SECTION_ROWS__\"; \$rows[0]) | fill(\"__EXCLUSION__\"; \$ex[0]) | fill(\"__SECTION_PANELS__\"; \$panels[0])" \
+  "$admin/page.base.json" > "$work/plugin_settings.json"
+
 cp "$root/resources/css/home.css" "$work/plugin.css"
 cp "$root/resources/js/home.js" "$work/plugin.iife.js"
 
@@ -92,6 +123,13 @@ for name in $lit $php_icons; do
 done
 echo "icons checked: $(echo $lit $php_icons | wc -w) (outside subset: $missing)"
 
+# 관리자 화면: 남은 자리표시 0, 노드 id 중복 0, 칸 패널 10개, 탭 6개
+left=$(grep -c '__[A-Z_]*__' "$work/plugin_settings.json" || true)
+adups=$(jq '[.. | objects | select(has("type") and has("name")) | .id // empty] | group_by(.) | map(select(length > 1)) | length' "$work/plugin_settings.json")
+apanels=$(jq '[.. | objects | select(.props?["data-testid"]? // "" | test("^g7hw-admin-s[1-5]c[12]$"))] | length' "$work/plugin_settings.json")
+echo "admin: placeholders left=$left duplicate ids=$adups col panels=$apanels tabs=$(jq 'length' "$work/tabs.json")"
+[ "$left" -eq 0 ] && [ "$adups" -eq 0 ] && [ "$apanels" -eq 10 ] || fail "관리자 화면 생성 검사"
+
 # ---------- 생성물 대조·쓰기 ----------
 sync_one() { # 임시본 대상
   local src=$1 dst=$2 rel=${2#"$root"/}
@@ -110,6 +148,7 @@ sync_one() { # 임시본 대상
   echo "written: $rel"
 }
 sync_one "$work/home.json" "$root/resources/extensions/home.json"
+sync_one "$work/plugin_settings.json" "$root/resources/layouts/admin/plugin_settings.json"
 sync_one "$work/plugin.css" "$root/dist/css/plugin.css"
 sync_one "$work/plugin.iife.js" "$root/dist/js/plugin.iife.js"
 

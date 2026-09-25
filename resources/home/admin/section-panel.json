@@ -1,0 +1,20 @@
+{
+    "type": "basic",
+    "name": "Div",
+    "if": "{{(_local.ui?.tab ?? 'layout') === 's__S__'}}",
+    "props": {
+        "className": "mt-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 space-y-6"
+    },
+    "children": [
+        {
+            "type": "basic",
+            "name": "P",
+            "if": "{{!_local.form?.s__S___enabled}}",
+            "props": {
+                "className": "alert-info text-sm"
+            },
+            "text": "$t:g7-home-widgets.home.col.section_off"
+        },
+        "__COLS__"
+    ]
+}

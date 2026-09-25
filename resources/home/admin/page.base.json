@@ -1,0 +1,309 @@
+{
+    "_comment": "홈 섹션 설정 화면 원본(틀). scripts/build-home.sh 가 \"__SECTION_ROWS__\"(section-row.json ×5), \"__EXCLUSION__\"(board_filter.v030.json 의 공통 제외 영역 노드), \"__SECTION_PANELS__\"(section-panel.json ×5, 칸 col-panel.json ×2)를 채워 resources/layouts/admin/plugin_settings.json 을 만든다.",
+    "version": "1.0.0",
+    "layout_name": "plugin_settings",
+    "permissions": ["core.plugins.read"],
+    "extends": "_admin_base",
+    "scripts": [
+        {
+            "src": "/api/plugins/g7-home-widgets/board-filter-drag.js?v=0.3.0",
+            "id": "g7_home_widgets_board_filter_drag",
+            "async": true
+        }
+    ],
+    "meta": {
+        "title": "$t:g7-home-widgets.home.title",
+        "description": "$t:g7-home-widgets.home.description"
+    },
+    "data_sources": [
+        {
+            "id": "homeForm",
+            "label_key": "$t:g7-home-widgets.home.title",
+            "type": "api",
+            "endpoint": "/api/plugins/g7-home-widgets/admin/home-form",
+            "method": "GET",
+            "auto_fetch": true,
+            "auth_required": true,
+            "initLocal": "form",
+            "refetchOnMount": true
+        },
+        {
+            "id": "boardFilter",
+            "label_key": "$t:g7-home-widgets.editor.data_source.board_filter",
+            "type": "api",
+            "endpoint": "/api/plugins/g7-home-widgets/admin/board-filter",
+            "method": "GET",
+            "auto_fetch": true,
+            "auth_required": true,
+            "refetchOnMount": true,
+            "onSuccess": [
+                {
+                    "handler": "setState",
+                    "params": {
+                        "target": "local",
+                        "excluded": "{{response.data.data.excluded_board_ids ?? []}}",
+                        "included": "{{(response.data.data.boards ?? []).map(b => b.id).filter(id => !(response.data.data.excluded_board_ids ?? []).includes(id))}}",
+                        "dirty": false
+                    }
+                }
+            ]
+        }
+    ],
+    "slots": {
+        "content": [
+            {
+                "id": "home_widgets_settings_content",
+                "type": "basic",
+                "name": "Div",
+                "dataKey": "form",
+                "trackChanges": true,
+                "props": {
+                    "className": "admin-page-content-responsive"
+                },
+                "children": [
+                    {
+                        "id": "page_header",
+                        "type": "composite",
+                        "name": "PageHeader",
+                        "props": {
+                            "title": "$t:g7-home-widgets.home.title",
+                            "description": "$t:g7-home-widgets.home.description",
+                            "backPath": "/admin/plugins",
+                            "backLabel": "$t:admin.plugins.back_to_list"
+                        }
+                    },
+                    {
+                        "id": "validation_error",
+                        "type": "basic",
+                        "name": "Div",
+                        "if": "{{_local.errors}}",
+                        "props": {
+                            "className": "alert-danger"
+                        },
+                        "children": [
+                            {
+                                "type": "basic",
+                                "name": "Ul",
+                                "props": {
+                                    "className": "list-disc list-inside space-y-1"
+                                },
+                                "iteration": {
+                                    "source": "Object.values(_local.errors ?? {}).flatMap(m => Array.isArray(m) ? m : [m])",
+                                    "item_var": "message"
+                                },
+                                "children": [
+                                    {
+                                        "type": "basic",
+                                        "name": "Li",
+                                        "props": {
+                                            "className": "text-error-soft"
+                                        },
+                                        "text": "{{message}}"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "home_tabs",
+                        "type": "basic",
+                        "name": "Div",
+                        "props": {
+                            "className": "mt-6 flex flex-wrap gap-2 border-b border-gray-200 dark:border-gray-700"
+                        },
+                        "children": "__TABS__"
+                    },
+                    {
+                        "id": "panel_layout",
+                        "type": "basic",
+                        "name": "Div",
+                        "if": "{{(_local.ui?.tab ?? 'layout') === 'layout'}}",
+                        "props": {
+                            "className": "mt-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 space-y-6"
+                        },
+                        "children": [
+                            {
+                                "id": "section_rows",
+                                "type": "basic",
+                                "name": "Div",
+                                "props": {
+                                    "className": "space-y-3"
+                                },
+                                "children": "__SECTION_ROWS__"
+                            },
+                            {
+                                "id": "exclusion_area",
+                                "type": "basic",
+                                "name": "Div",
+                                "props": {
+                                    "className": "pt-6 border-t border-gray-200 dark:border-gray-700 space-y-4"
+                                },
+                                "children": [
+                                    {
+                                        "type": "basic",
+                                        "name": "H3",
+                                        "props": {
+                                            "className": "text-base font-semibold text-gray-900 dark:text-white"
+                                        },
+                                        "text": "$t:g7-home-widgets.home.layout.excluded_title"
+                                    },
+                                    {
+                                        "type": "basic",
+                                        "name": "P",
+                                        "props": {
+                                            "className": "text-sm text-gray-500 dark:text-gray-400"
+                                        },
+                                        "text": "$t:g7-home-widgets.home.layout.excluded_help"
+                                    },
+                                    "__EXCLUSION__"
+                                ]
+                            }
+                        ]
+                    },
+                    "__SECTION_PANELS__",
+                    {
+                        "type": "basic",
+                        "name": "Div",
+                        "props": {
+                            "className": "mt-4 flex justify-end gap-3"
+                        },
+                        "children": [
+                            {
+                                "id": "cancel_button",
+                                "type": "basic",
+                                "name": "Button",
+                                "props": {
+                                    "className": "btn btn-secondary"
+                                },
+                                "actions": [
+                                    {
+                                        "type": "click",
+                                        "handler": "navigate",
+                                        "params": {
+                                            "path": "/admin/plugins"
+                                        }
+                                    }
+                                ],
+                                "children": [
+                                    {
+                                        "type": "basic",
+                                        "name": "Span",
+                                        "text": "$t:common.cancel"
+                                    }
+                                ]
+                            },
+                            {
+                                "id": "save_button",
+                                "type": "basic",
+                                "name": "Button",
+                                "props": {
+                                    "disabled": "{{_local.isSaving || !homeForm?.data || !boardFilter?.data}}",
+                                    "className": "btn btn-primary flex-center gap-1.5"
+                                },
+                                "actions": [
+                                    {
+                                        "type": "click",
+                                        "handler": "sequence",
+                                        "actions": [
+                                            {
+                                                "handler": "setState",
+                                                "params": {
+                                                    "target": "local",
+                                                    "isSaving": true,
+                                                    "errors": null
+                                                }
+                                            },
+                                            {
+                                                "handler": "apiCall",
+                                                "auth_required": true,
+                                                "target": "/api/admin/plugins/g7-home-widgets/settings",
+                                                "params": {
+                                                    "method": "PUT",
+                                                    "body": {
+                                                        "home_layout_form": "{{_local.form}}",
+                                                        "excluded_board_ids": "{{_local.excluded ?? []}}"
+                                                    }
+                                                },
+                                                "onSuccess": [
+                                                    {
+                                                        "handler": "setState",
+                                                        "params": {
+                                                            "target": "local",
+                                                            "isSaving": false,
+                                                            "dirty": false,
+                                                            "hasChanges": false
+                                                        }
+                                                    },
+                                                    {
+                                                        "handler": "toast",
+                                                        "params": {
+                                                            "type": "success",
+                                                            "message": "$t:g7-home-widgets.settings.save_success"
+                                                        }
+                                                    },
+                                                    {
+                                                        "handler": "refetchDataSource",
+                                                        "params": {
+                                                            "dataSourceId": "homeForm"
+                                                        }
+                                                    },
+                                                    {
+                                                        "handler": "refetchDataSource",
+                                                        "params": {
+                                                            "dataSourceId": "boardFilter"
+                                                        }
+                                                    }
+                                                ],
+                                                "onError": [
+                                                    {
+                                                        "handler": "setState",
+                                                        "params": {
+                                                            "target": "local",
+                                                            "isSaving": false,
+                                                            "errors": "{{error.errors}}"
+                                                        }
+                                                    },
+                                                    {
+                                                        "handler": "toast",
+                                                        "params": {
+                                                            "type": "error",
+                                                            "message": "{{error.message ?? '$t:g7-home-widgets.settings.save_error'}}"
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "children": [
+                                    {
+                                        "type": "basic",
+                                        "name": "Icon",
+                                        "if": "{{_local.isSaving}}",
+                                        "props": {
+                                            "name": "spinner",
+                                            "className": "spinner-sm"
+                                        }
+                                    },
+                                    {
+                                        "type": "basic",
+                                        "name": "Span",
+                                        "text": "{{_local.isSaving ? '$t:common.saving' : '$t:common.save'}}"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    },
+    "schema": {
+        "excluded_board_ids": {
+            "type": "array",
+            "default": [],
+            "label": "$t:g7-home-widgets.settings.excluded_title",
+            "hint": "$t:g7-home-widgets.settings.notice"
+        }
+    }
+}

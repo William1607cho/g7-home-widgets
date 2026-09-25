@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Plugins\G7\Home\Widgets\Http\Controllers\Admin\BoardFilterAdminController;
+use Plugins\G7\Home\Widgets\Http\Controllers\Admin\HomeFormAdminController;
 use Plugins\G7\Home\Widgets\Http\Controllers\BoardFilterDragScriptController;
 use Plugins\G7\Home\Widgets\Http\Controllers\HomeLayoutController;
 use Plugins\G7\Home\Widgets\Http\Controllers\NoticePostsController;
@@ -53,4 +54,9 @@ Route::prefix('admin')->name('admin.')->middleware('auth:sanctum')->group(functi
     Route::put('board-filter', [BoardFilterAdminController::class, 'update'])
         ->middleware('permission:admin,core.plugins.update')
         ->name('board-filter.update');
+
+    // 홈 섹션 설정 화면의 평면 폼(0.4.0). 저장은 코어 PUT /api/admin/plugins/{id}/settings.
+    Route::get('home-form', [HomeFormAdminController::class, 'show'])
+        ->middleware('permission:admin,core.plugins.read')
+        ->name('home-form.show');
 });
