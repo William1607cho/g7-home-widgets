@@ -6,8 +6,8 @@ use App\Helpers\ResponseHelper;
 use App\Http\Controllers\Api\Base\AdminBaseController;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
-use Modules\Sirsoft\Board\Models\Board;
 use Plugins\G7\Home\Widgets\Http\Requests\UpdateBoardFilterRequest;
+use Plugins\G7\Home\Widgets\Support\BoardDirectory;
 use Plugins\G7\Home\Widgets\Support\BoardFilterSettings;
 
 /**
@@ -28,6 +28,14 @@ class BoardFilterAdminController extends AdminBaseController
     private const DOMAIN = 'g7-home-widgets';
 
     /**
+     * 게시판 조회는 {@see BoardDirectory} 가 맡는다(0.4.0 정리 A — 컨트롤러 안 쿼리 제거, 동작 같음).
+     */
+    public function __construct(private readonly BoardDirectory $boards)
+    {
+        parent::__construct();
+    }
+
+    /**
      * 게시판 목록과 현재 제외 목록을 반환합니다.
      */
     public function show(): JsonResponse
@@ -45,9 +53,7 @@ class BoardFilterAdminController extends AdminBaseController
     {
         $requested = $request->excludedBoardIds();
 
-        $existing = $requested === []
-            ? []
-            : Board::query()->whereIn('id', $requested)->pluck('id')->map(fn ($id) => (int) $id)->all();
+        $existing = $this->boards->existingIds($requested);
 
         $previousFingerprint = BoardFilterSettings::fingerprint(BoardFilterSettings::excludedIds());
 
@@ -70,21 +76,11 @@ class BoardFilterAdminController extends AdminBaseController
      */
     private function payload(): array
     {
-        // audit:allow query-unbounded-get reason: boards 는 운영자 등록 설정성 테이블 — 행 수가 운영자 행위에 묶여 데이터 증가에 비례하지 않는다
-        $boards = Board::query()
-            ->orderBy('id')
-            ->get(['id', 'name', 'slug', 'is_active']);
-
-        $boardIds = $boards->pluck('id')->map(fn ($id) => (int) $id)->all();
+        $boards = $this->boards->all();
 
         return [
-            'boards' => $boards->map(fn (Board $board) => [
-                'id' => (int) $board->id,
-                'name' => $board->getLocalizedName(),
-                'slug' => (string) $board->slug,
-                'is_active' => (bool) $board->is_active,
-            ])->values()->all(),
-            'excluded_board_ids' => array_values(array_intersect(BoardFilterSettings::excludedIds(), $boardIds)),
+            'boards' => $boards,
+            'excluded_board_ids' => array_values(array_intersect(BoardFilterSettings::excludedIds(), array_column($boards, 'id'))),
         ];
     }
 }
