@@ -1,0 +1,121 @@
+{
+    "type": "basic",
+    "name": "Div",
+    "if": "{{col.type === 'ticker'}}",
+    "props": {
+        "className": "g7hw-w g7hw-w-ticker"
+    },
+    "lifecycle": {
+        "onMount": [
+            {
+                "handler": "g7-home-widgets.ticker",
+                "params": {
+                    "key": "{{col.key}}"
+                }
+            }
+        ],
+        "onUnmount": [
+            {
+                "handler": "g7-home-widgets.tickerStop",
+                "params": {
+                    "key": "{{col.key}}"
+                }
+            }
+        ]
+    },
+    "children": [
+        {
+            "type": "basic",
+            "name": "Div",
+            "if": "{{col.items && col.items.length > 0}}",
+            "props": {
+                "className": "g7hw-ticker",
+                "role": "region",
+                "aria-label": "{{col.title}}"
+            },
+            "children": [
+                {
+                    "type": "basic",
+                    "name": "Span",
+                    "props": {
+                        "className": "g7hw-ticker-label"
+                    },
+                    "children": [
+                        {
+                            "type": "basic",
+                            "name": "Icon",
+                            "props": {
+                                "name": "{{col.icon}}",
+                                "className": "g7hw-title-icon"
+                            }
+                        },
+                        {
+                            "type": "basic",
+                            "name": "Span",
+                            "text": "{{col.title}}"
+                        }
+                    ]
+                },
+                {
+                    "type": "basic",
+                    "name": "Div",
+                    "props": {
+                        "className": "g7hw-ticker-window"
+                    },
+                    "children": [
+                        {
+                            "type": "basic",
+                            "name": "Ul",
+                            "props": {
+                                "className": "g7hw-ticker-track"
+                            },
+                            "children": [
+                                {
+                                    "type": "basic",
+                                    "name": "Li",
+                                    "iteration": {
+                                        "source": "{{col.items ?? []}}",
+                                        "item_var": "item"
+                                    },
+                                    "props": {
+                                        "className": "g7hw-item g7hw-ticker-row"
+                                    },
+                                    "children": [
+                                        {
+                                            "type": "basic",
+                                            "name": "A",
+                                            "props": {
+                                                "className": "g7hw-link",
+                                                "href": "/board/{{item.board_slug}}/{{item.id}}"
+                                            },
+                                            "actions": [
+                                                {
+                                                    "type": "click",
+                                                    "handler": "navigate",
+                                                    "params": {
+                                                        "path": "/board/{{item.board_slug}}/{{item.id}}"
+                                                    }
+                                                }
+                                            ],
+                                            "text": "{{item.title}}"
+                                        },
+                                        {
+                                            "type": "basic",
+                                            "name": "Span",
+                                            "if": "{{item.created_at_formatted}}",
+                                            "props": {
+                                                "className": "g7hw-date",
+                                                "title": "{{item.created_at ?? ''}}"
+                                            },
+                                            "text": "{{item.created_at_formatted}}"
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

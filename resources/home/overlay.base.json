@@ -1,0 +1,68 @@
+{
+    "_comment": "홈 섹션 overlay 원본(틀). scripts/build-home.sh 가 칸 노드의 children(\"__WIDGETS__\")을 resources/home/widgets/<종류>.json 조각으로 채워 resources/extensions/home.json 을 만든다. 생성물을 직접 고치지 않는다.",
+    "target_layout": "home",
+    "priority": 100,
+    "data_sources": [
+        {
+            "id": "g7hw_home",
+            "type": "api",
+            "endpoint": "/api/plugins/g7-home-widgets/home",
+            "method": "GET",
+            "auto_fetch": true,
+            "auth_mode": "optional",
+            "loading_strategy": "progressive",
+            "fallback": {
+                "data": {
+                    "has_sections": false,
+                    "sections": [],
+                    "fallbacks": []
+                }
+            }
+        }
+    ],
+    "injections": [
+        {
+            "target_id": "main_content",
+            "position": "prepend_child",
+            "components": [
+                {
+                    "id": "g7hw_root",
+                    "type": "basic",
+                    "name": "Div",
+                    "if": "{{g7hw_home?.data?.has_sections}}",
+                    "props": {
+                        "className": "g7hw-root"
+                    },
+                    "children": [
+                        {
+                            "type": "basic",
+                            "name": "Div",
+                            "iteration": {
+                                "source": "{{g7hw_home?.data?.sections ?? []}}",
+                                "item_var": "sec"
+                            },
+                            "props": {
+                                "className": "{{sec.row_class}}"
+                            },
+                            "children": [
+                                {
+                                    "type": "basic",
+                                    "name": "Div",
+                                    "iteration": {
+                                        "source": "{{sec.cols ?? []}}",
+                                        "item_var": "col"
+                                    },
+                                    "props": {
+                                        "className": "g7hw-col",
+                                        "data-testid": "g7hw-{{col.key}}"
+                                    },
+                                    "children": "__WIDGETS__"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
