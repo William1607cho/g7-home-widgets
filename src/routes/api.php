@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Plugins\G7\Home\Widgets\Http\Controllers\Admin\BoardFilterAdminController;
 use Plugins\G7\Home\Widgets\Http\Controllers\BoardFilterDragScriptController;
+use Plugins\G7\Home\Widgets\Http\Controllers\HomeLayoutController;
 use Plugins\G7\Home\Widgets\Http\Controllers\NoticePostsController;
 use Plugins\G7\Home\Widgets\Http\Controllers\PopularPostsController;
 use Plugins\G7\Home\Widgets\Http\Controllers\RecentPostsController;
@@ -30,6 +31,13 @@ Route::get('popular-posts', [PopularPostsController::class, 'index'])
 Route::get('notice-posts', [NoticePostsController::class, 'index'])
     ->middleware(['optional.sanctum', 'throttle:600,1'])
     ->name('notice-posts.index');
+
+// 홈 섹션(0.4.0) — 섹션·칸 구성과 칸별 목록을 한 번에 준다. overlay 데이터소스 g7hw_home 이 부르고,
+// 봇 화면은 같은 서비스를 core.seo.filter_context 필터로 받는다. 로그인 여부에 따라 열람 가능
+// 게시판이 달라지므로 optional.sanctum.
+Route::get('home', [HomeLayoutController::class, 'index'])
+    ->middleware(['optional.sanctum', 'throttle:600,1'])
+    ->name('home.index');
 
 // 위젯 게시판 설정 화면의 카드 드래그 스크립트 (공개 — 설정 레이아웃의 scripts 가 로드, 0.3.0)
 Route::get('board-filter-drag.js', [BoardFilterDragScriptController::class, 'show'])

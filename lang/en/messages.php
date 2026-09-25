@@ -5,4 +5,21 @@ return [
         'saved' => 'Widget board settings saved.',
         'save_failed' => 'Failed to save the widget board settings.',
     ],
+    'home' => [
+        'titles' => [
+            'recent' => 'Recent Posts',
+            'popular' => 'Popular Posts',
+            'ticker' => 'Notice',
+        ],
+        'periods' => [
+            'week' => 'This Week',
+            'month' => 'This Month',
+            'year' => '1 Year',
+        ],
+        'empty' => [
+            'recent' => 'No posts yet.',
+            'popular' => 'No popular posts',
+            'ticker' => '',
+        ],
+    ],
 ];
