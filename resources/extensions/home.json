@@ -10,6 +10,15 @@
             "auto_fetch": true,
             "auth_mode": "optional",
             "loading_strategy": "progressive",
+            "errorHandling": {
+                "default": {
+                    "handler": "setState",
+                    "params": {
+                        "target": "local",
+                        "g7hwHomeError": true
+                    }
+                }
+            },
             "fallback": {
                 "data": {
                     "has_sections": false,
