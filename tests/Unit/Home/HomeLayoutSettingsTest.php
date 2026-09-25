@@ -131,6 +131,16 @@ class HomeLayoutSettingsTest extends TestCase
         $this->assertArrayNotHasKey('period', $col);
     }
 
+    public function test_ticker_keeps_one_board_in_only_mode(): void
+    {
+        $out = $this->settings()->normalize(['sections' => [[
+            'enabled' => true, 'columns' => 1,
+            'cols' => [['type' => 'ticker', 'boards' => ['mode' => 'all', 'ids' => [9, 3, 5]]]],
+        ]]], null);
+
+        $this->assertSame(['mode' => 'only', 'ids' => [3]], $out['sections'][0]['cols'][0]['boards']);
+    }
+
     public function test_board_ids_are_capped(): void
     {
         $ids = HomeLayoutSettings::normalizeIds(range(1, HomeLayoutSettings::MAX_BOARD_IDS + 10));

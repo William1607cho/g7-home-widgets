@@ -53,6 +53,17 @@ class PostListsTest extends TestCase
         $this->assertSame([], PostLists::keepBoards($items, [], 5));
     }
 
+    public function test_fill_board_names_uses_known_boards_only(): void
+    {
+        $out = PostLists::fillBoardNames([
+            ['board_slug' => 'a', 'board_name' => null],
+            ['board_slug' => 'b', 'board_name' => 'Kept'],
+            ['board_slug' => 'z', 'board_name' => ''],
+        ], ['a' => 'Alpha', 'b' => 'Beta']);
+
+        $this->assertSame(['Alpha', 'Kept', ''], array_column($out, 'board_name'));
+    }
+
     public function test_pick_keeps_only_listed_keys(): void
     {
         $out = PostLists::pick([['id' => 1, 'author' => ['email' => 'x'], 'title' => 't']], ['id', 'title', 'missing']);

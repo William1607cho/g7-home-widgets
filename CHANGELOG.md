@@ -36,6 +36,10 @@ Development version `0.4.0` (staging only). Part 1 of the home sections rework.
   widget's selection − the common excluded list (`excluded_board_ids`). Read permission,
   secret and deleted posts are still decided by sirsoft-board; popular posts come from the
   sirsoft-board popular cache (a narrow board selection can return fewer items than the limit).
+  A missing board name on a popular post is filled from the readable-board list already loaded.
+- The news ticker uses exactly one board and is **not** affected by the common excluded list
+  (only read permission applies), so a notice board that is hidden from the other widgets still
+  feeds the ticker.
 - Widget data cache keys carry a generation number. Post create/update/delete/blind/restore,
   board updates and saving this plugin's settings bump it, so a bot page re-rendered right after
   a new post no longer shows the old list for the bot cache lifetime. Saving this plugin's

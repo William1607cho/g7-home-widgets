@@ -46,14 +46,32 @@ final class TickerWidget implements HomeWidget
         return [1, 10];
     }
 
+    /**
+     * 티커는 게시판 1개만 고른다: 방식은 항상 `only`, id 는 첫 번째 하나만 남긴다.
+     */
     public function normalize(array $col, array $raw): array
     {
+        $ids = $col['boards']['ids'] ?? [];
+        $col['boards'] = ['mode' => 'only', 'ids' => $ids === [] ? [] : [(int) $ids[0]]];
+
         return $col;
     }
 
     public function rules(string $prefix): array
     {
-        return ["{$prefix}.limit" => ['integer', 'min:1', 'max:10']];
+        return [
+            "{$prefix}.limit" => ['integer', 'min:1', 'max:10'],
+            "{$prefix}.boards.ids" => ['array', 'max:1'],
+        ];
+    }
+
+    /**
+     * 공통 제외 목록을 적용하지 않는다(확정 사항) — blog 처럼 공지 게시판이 공통 제외에 있어도
+     * 티커는 비지 않는다. 열람 가능 판정은 {@see \Plugins\G7\Home\Widgets\Home\BoardScope} 가 그대로 적용한다.
+     */
+    public function appliesCommonExclusion(): bool
+    {
+        return false;
     }
 
     public function available(): bool

@@ -67,6 +67,11 @@ final class PopularWidget implements HomeWidget
         ];
     }
 
+    public function appliesCommonExclusion(): bool
+    {
+        return true;
+    }
+
     public function available(): bool
     {
         return true;
@@ -80,10 +85,12 @@ final class PopularWidget implements HomeWidget
     public function data(array $col, array $boards): array
     {
         $slugs = array_column($boards, 'slug');
+        $names = array_column($boards, 'name', 'slug');
         $limit = (int) $col['limit'];
         $periods = [];
         foreach (self::PERIODS as $period) {
             $items = $slugs === [] ? [] : PostLists::keepBoards($this->source->popular($period, $limit), $slugs, $limit);
+            $items = PostLists::fillBoardNames($items, $names);
             $periods[] = [
                 'key' => $period,
                 'label' => __('g7-home-widgets::messages.home.periods.'.$period),

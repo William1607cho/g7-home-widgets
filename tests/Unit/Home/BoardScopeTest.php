@@ -44,6 +44,15 @@ class BoardScopeTest extends TestCase
         $this->assertSame([], $scope->resolve(['mode' => 'only', 'ids' => [1]]));
     }
 
+    public function test_excluded_list_can_be_skipped_but_readability_still_applies(): void
+    {
+        $scope = new BoardScope($this->readable(), [1]);
+
+        // 티커: 공통 제외(1)는 적용하지 않지만 열람 불가(42)는 여전히 빠진다
+        $this->assertSame([1], array_column($scope->resolve(['mode' => 'only', 'ids' => [1]], false), 'id'));
+        $this->assertSame([], $scope->resolve(['mode' => 'only', 'ids' => [42]], false));
+    }
+
     public function test_empty_selection_in_only_mode_gives_nothing(): void
     {
         $scope = new BoardScope($this->readable(), []);

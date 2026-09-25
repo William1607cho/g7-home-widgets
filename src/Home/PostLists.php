@@ -65,6 +65,25 @@ final class PostLists
     }
 
     /**
+     * 게시판 이름이 비어 있는 항목을 이미 가진 열람 가능 게시판 목록(slug → 이름)으로 채운다.
+     * 추가 조회는 하지 않는다. 대응이 없으면 빈 이름 그대로 둔다.
+     *
+     * @param  array<int, array<string, mixed>>  $items
+     * @param  array<string, string>  $namesBySlug
+     * @return array<int, array<string, mixed>>
+     */
+    public static function fillBoardNames(array $items, array $namesBySlug): array
+    {
+        foreach ($items as $i => $item) {
+            if (($item['board_name'] ?? '') === '' || $item['board_name'] === null) {
+                $items[$i]['board_name'] = $namesBySlug[$item['board_slug'] ?? ''] ?? '';
+            }
+        }
+
+        return $items;
+    }
+
+    /**
      * 항목에서 지정한 키만 남긴다(응답 크기·노출 칸 고정).
      *
      * @param  array<int, array<string, mixed>>  $items

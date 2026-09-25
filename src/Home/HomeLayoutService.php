@@ -78,7 +78,7 @@ final class HomeLayoutService
             'title' => $title,
             'icon' => $col['icon'] !== '' ? $col['icon'] : $widget->defaultIcon(),
             'empty_text' => __('g7-home-widgets::messages.home.empty.'.$widget->id()),
-        ] + $widget->data($col, $scope->resolve($col['boards']));
+        ] + $widget->data($col, $scope->resolve($col['boards'], $widget->appliesCommonExclusion()));
     }
 
     /**

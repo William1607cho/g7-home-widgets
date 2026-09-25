@@ -39,10 +39,14 @@ final class BoardScope
     /**
      * 칸 설정의 `boards` 로 실제 쓸 게시판 목록을 정한다(코어 정렬 순서 유지).
      *
+     * 공통 제외를 적용하지 않는 종류(티커)는 `$applyExcluded = false` 로 부른다 — 열람 가능 판정은
+     * 그대로 적용된다(열람 가능 목록 밖의 id 는 나오지 않는다).
+     *
      * @param  array{mode: string, ids: array<int, int>}  $boards  정리된 선택
+     * @param  bool  $applyExcluded  공통 제외 목록을 뺄지
      * @return array<int, array{id: int, slug: string, name: string}>
      */
-    public function resolve(array $boards): array
+    public function resolve(array $boards, bool $applyExcluded = true): array
     {
         $only = null;
         if (($boards['mode'] ?? 'all') === 'only') {
@@ -51,7 +55,7 @@ final class BoardScope
 
         $out = [];
         foreach ($this->readable as $id => $board) {
-            if (isset($this->excluded[$id])) {
+            if ($applyExcluded && isset($this->excluded[$id])) {
                 continue;
             }
             if ($only !== null && ! isset($only[$id])) {

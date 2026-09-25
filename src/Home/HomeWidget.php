@@ -61,6 +61,11 @@ interface HomeWidget
     public function rules(string $prefix): array;
 
     /**
+     * 공통 제외 목록(`excluded_board_ids`)을 적용하는가. 티커는 고른 게시판 1개를 그대로 쓰므로 거짓.
+     */
+    public function appliesCommonExclusion(): bool;
+
+    /**
      * 지금 고를 수 있는 종류인가(애드온 의존 종류용).
      */
     public function available(): bool;

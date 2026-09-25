@@ -89,6 +89,11 @@ final class FakeHomeWidget implements HomeWidget
         return [];
     }
 
+    public function appliesCommonExclusion(): bool
+    {
+        return true;
+    }
+
     public function available(): bool
     {
         return $this->available;

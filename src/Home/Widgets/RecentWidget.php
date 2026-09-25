@@ -55,6 +55,11 @@ final class RecentWidget implements HomeWidget
         return ["{$prefix}.limit" => ['integer', 'min:1', 'max:20']];
     }
 
+    public function appliesCommonExclusion(): bool
+    {
+        return true;
+    }
+
     public function available(): bool
     {
         return true;
