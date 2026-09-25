@@ -56,13 +56,20 @@
             "ticker_board": "게시판 (1개)",
             "ticker_pick": "게시판을 고르세요",
             "period": "기본 기간 탭",
-            "section_off": "이 섹션은 꺼져 있습니다. [위젯 레이아웃] 탭에서 켤 수 있습니다."
+            "section_off": "이 섹션은 꺼져 있습니다. [위젯 레이아웃] 탭에서 켤 수 있습니다.",
+            "title": "제목",
+            "title_placeholder": "비우면 기본 제목",
+            "icon": "아이콘",
+            "default_icon": "(기본 아이콘)",
+            "html": "HTML",
+            "html_help": "HTML 만 넣을 수 있습니다. 스크립트·이벤트 속성(onclick 등)·javascript: 링크는 저장할 때와 보여줄 때 모두 제거됩니다."
         },
         "types": {
             "recent": "최근글",
             "popular": "인기글",
             "ticker": "뉴스 티커",
-            "gallery": "갤러리"
+            "gallery": "갤러리",
+            "html": "HTML"
         },
         "periods": {
             "week": "이번주",

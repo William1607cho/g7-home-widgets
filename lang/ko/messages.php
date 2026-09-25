@@ -11,6 +11,7 @@ return [
             'popular' => '인기글',
             'ticker' => '공지',
             'gallery' => '갤러리',
+            'html' => '알림판',
         ],
         'periods' => [
             'week' => '이번주',
@@ -22,9 +23,11 @@ return [
             'popular' => '인기 게시글이 없습니다',
             'ticker' => '',
             'gallery' => '아직 게시글이 없습니다.',
+            'html' => '',
         ],
         'validation' => [
             'ticker_single_board' => '뉴스 티커는 게시판을 하나만 고를 수 있습니다.',
+            'html_unavailable' => 'HTML 정제기를 쓸 수 없어 HTML 을 저장하지 않았습니다.',
         ],
     ],
 ];

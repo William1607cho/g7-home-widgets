@@ -56,13 +56,20 @@
             "ticker_board": "Board (one)",
             "ticker_pick": "Choose a board",
             "period": "Default period tab",
-            "section_off": "This section is off. Turn it on in the Widget Layout tab."
+            "section_off": "This section is off. Turn it on in the Widget Layout tab.",
+            "title": "Title",
+            "title_placeholder": "Empty = default title",
+            "icon": "Icon",
+            "default_icon": "(default icon)",
+            "html": "HTML",
+            "html_help": "HTML only. Scripts, event attributes (onclick, ...) and javascript: links are removed both when saving and when showing."
         },
         "types": {
             "recent": "Recent posts",
             "popular": "Popular posts",
             "ticker": "News ticker",
-            "gallery": "Gallery"
+            "gallery": "Gallery",
+            "html": "HTML"
         },
         "periods": {
             "week": "This Week",

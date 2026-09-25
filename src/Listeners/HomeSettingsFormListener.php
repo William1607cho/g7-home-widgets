@@ -3,6 +3,7 @@
 namespace Plugins\G7\Home\Widgets\Listeners;
 
 use App\Contracts\Extension\HookListenerInterface;
+use Plugins\G7\Home\Widgets\Home\HomeIcons;
 use Plugins\G7\Home\Widgets\Home\HomeLayoutForm;
 use Plugins\G7\Home\Widgets\Home\HomeSettingsAdmin;
 use Plugins\G7\Home\Widgets\Home\WidgetRegistry;
@@ -41,7 +42,7 @@ class HomeSettingsFormListener implements HookListenerInterface
             return $rules;
         }
 
-        return $rules + HomeLayoutForm::rules(app(WidgetRegistry::class)->ids(), is_array($input) ? $input : []);
+        return $rules + HomeLayoutForm::rules(app(WidgetRegistry::class)->ids(), is_array($input) ? $input : [], HomeIcons::load());
     }
 
     /**

@@ -5,7 +5,10 @@ namespace Plugins\G7\Home\Widgets\Providers;
 use App\Extension\BasePluginServiceProvider;
 use Plugins\G7\Home\Widgets\Home\WidgetCache;
 use Plugins\G7\Home\Widgets\Home\WidgetRegistry;
+use Plugins\G7\Home\Widgets\Home\HomeIcons;
+use Plugins\G7\Home\Widgets\Home\HomeLayoutSettings;
 use Plugins\G7\Home\Widgets\Home\Widgets\GalleryWidget;
+use Plugins\G7\Home\Widgets\Home\Widgets\HtmlWidget;
 use Plugins\G7\Home\Widgets\Home\Widgets\PopularWidget;
 use Plugins\G7\Home\Widgets\Home\Widgets\RecentWidget;
 use Plugins\G7\Home\Widgets\Home\Widgets\TickerWidget;
@@ -30,6 +33,7 @@ class HomeWidgetsServiceProvider extends BasePluginServiceProvider
         PopularWidget::class,
         TickerWidget::class,
         GalleryWidget::class,
+        HtmlWidget::class,
     ];
 
     public function register(): void
@@ -39,6 +43,10 @@ class HomeWidgetsServiceProvider extends BasePluginServiceProvider
         $this->app->singleton(WidgetCache::class);
         $this->app->singleton(WidgetRegistry::class, fn ($app) => new WidgetRegistry(
             array_map(fn (string $class) => $app->make($class), self::WIDGETS)
+        ));
+        $this->app->singleton(HomeLayoutSettings::class, fn ($app) => new HomeLayoutSettings(
+            $app->make(WidgetRegistry::class),
+            HomeIcons::load(),
         ));
     }
 }

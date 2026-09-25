@@ -50,6 +50,7 @@
                 {
                     "type": "basic",
                     "name": "Div",
+                    "if": "{{_local.form?.__K___type !== 'html'}}",
                     "children": [
                         {
                             "type": "basic",
@@ -136,7 +137,115 @@
         {
             "type": "basic",
             "name": "Div",
-            "if": "{{_local.form?.__K___type !== 'ticker'}}",
+            "props": {
+                "className": "flex flex-wrap items-end gap-4"
+            },
+            "children": [
+                {
+                    "type": "basic",
+                    "name": "Div",
+                    "children": [
+                        {
+                            "type": "basic",
+                            "name": "Label",
+                            "props": {
+                                "htmlFor": "__K___title",
+                                "className": "form-label"
+                            },
+                            "text": "$t:g7-home-widgets.home.col.title"
+                        },
+                        {
+                            "type": "basic",
+                            "name": "Input",
+                            "props": {
+                                "id": "__K___title",
+                                "name": "__K___title",
+                                "type": "text",
+                                "maxLength": 60,
+                                "placeholder": "$t:g7-home-widgets.home.col.title_placeholder",
+                                "className": "input w-64"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "type": "basic",
+                    "name": "Div",
+                    "children": [
+                        {
+                            "type": "basic",
+                            "name": "Label",
+                            "props": {
+                                "htmlFor": "__K___icon",
+                                "className": "form-label"
+                            },
+                            "text": "$t:g7-home-widgets.home.col.icon"
+                        },
+                        {
+                            "type": "basic",
+                            "name": "Select",
+                            "props": {
+                                "id": "__K___icon",
+                                "name": "__K___icon",
+                                "className": "input",
+                                "options": "__ICON_OPTIONS__"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "type": "basic",
+                    "name": "Icon",
+                    "if": "{{_local.form?.__K___icon}}",
+                    "props": {
+                        "name": "{{_local.form?.__K___icon}}",
+                        "className": "w-5 h-5 text-gray-500"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "basic",
+            "name": "Div",
+            "if": "{{_local.form?.__K___type === 'html'}}",
+            "props": {
+                "className": "space-y-2"
+            },
+            "children": [
+                {
+                    "type": "basic",
+                    "name": "Label",
+                    "props": {
+                        "htmlFor": "__K___html",
+                        "className": "form-label"
+                    },
+                    "text": "$t:g7-home-widgets.home.col.html"
+                },
+                {
+                    "type": "basic",
+                    "name": "Textarea",
+                    "props": {
+                        "id": "__K___html",
+                        "name": "__K___html",
+                        "rows": 8,
+                        "maxLength": 20000,
+                        "className": "input w-full font-mono text-sm"
+                    }
+                },
+                {
+                    "type": "basic",
+                    "name": "P",
+                    "props": {
+                        "className": "text-xs text-gray-500 dark:text-gray-400"
+                    },
+                    "text": "$t:g7-home-widgets.home.col.html_help"
+                }
+            ]
+        },
+        {
+            "type": "basic",
+            "name": "Div",
+            "if": "{{_local.form?.__K___type !== 'ticker' && _local.form?.__K___type !== 'html'}}",
             "props": {
                 "className": "space-y-3"
             },

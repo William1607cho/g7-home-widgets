@@ -34,7 +34,16 @@ final class HomeLayoutSettings
     /** 제목 최대 글자 수 */
     public const TITLE_MAX = 60;
 
-    public function __construct(private readonly WidgetRegistry $registry) {}
+    /** @var array<string, true> 허용 아이콘(비어 있으면 이름 형식만 본다) */
+    private array $icons;
+
+    /**
+     * @param  array<int, string>  $icons  제목 아이콘 허용 목록(wc-community 서브셋, {@see HomeIcons})
+     */
+    public function __construct(private readonly WidgetRegistry $registry, array $icons = [])
+    {
+        $this->icons = array_fill_keys($icons, true);
+    }
 
     /**
      * 기본 설정(5개 섹션).
@@ -126,7 +135,7 @@ final class HomeLayoutSettings
         $col = [
             'type' => $type,
             'title' => self::cleanTitle($in['title'] ?? ''),
-            'icon' => self::cleanIcon($in['icon'] ?? ''),
+            'icon' => $this->cleanIcon($in['icon'] ?? ''),
             'limit' => $limit === null ? $base['limit'] : max($min, min($max, $limit)),
             'boards' => self::normalizeBoards($in['boards'] ?? null, $base['boards']),
         ];
@@ -191,9 +200,16 @@ final class HomeLayoutSettings
         return mb_substr($value, 0, self::TITLE_MAX);
     }
 
-    private static function cleanIcon(mixed $value): string
+    /**
+     * 허용 목록 밖 아이콘은 빈 값(= 위젯 기본 아이콘)으로 되돌린다.
+     */
+    private function cleanIcon(mixed $value): string
     {
-        return is_string($value) && preg_match('/^[a-z0-9-]{1,40}$/', $value) === 1 ? $value : '';
+        if (! is_string($value) || preg_match('/^[a-z0-9-]{1,40}$/', $value) !== 1) {
+            return '';
+        }
+
+        return $this->icons === [] || isset($this->icons[$value]) ? $value : '';
     }
 
     private static function toInt(mixed $value): ?int

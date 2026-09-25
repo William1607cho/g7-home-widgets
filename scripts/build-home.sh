@@ -70,20 +70,22 @@ stamp() { # 파일 [찾을 문자열 바꿀 문자열]... → 모든 문자열 �
   jq "${args[@]}" "$prog" "$f"
 }
 jq -c '[.[] | {value: ., label: ("$t:g7-home-widgets.home.types." + .)}]' "$registry" > "$work/type_opts.json"
+jq -c '[{value: "", label: "$t:g7-home-widgets.home.col.default_icon"}] + [.icons[] | {value: ., label: .}]' "$root/resources/home/icons.json" > "$work/icon_opts.json"
 for t in layout s1 s2 s3 s4 s5; do stamp "$admin/tab.json" __TAB__ "$t"; done | jq -s '.' > "$work/tabs.json"
 for s in 1 2 3 4 5; do stamp "$admin/section-row.json" __S__ "$s"; done | jq -s '.' > "$work/rows.json"
 : > "$work/panels.ndjson"
 for s in 1 2 3 4 5; do
   for c in 1 2; do
     stamp "$admin/col-panel.json" __K__ "s${s}c${c}" __S__ "$s" __C__ "$c" \
-      | jq --slurpfile o "$work/type_opts.json" "$FILL fill(\"__TYPE_OPTIONS__\"; \$o[0])"
+      | jq --slurpfile o "$work/type_opts.json" --slurpfile i "$work/icon_opts.json" "$FILL fill(\"__TYPE_OPTIONS__\"; \$o[0]) | fill(\"__ICON_OPTIONS__\"; \$i[0])"
   done | jq -s '.' > "$work/cols.json"
   stamp "$admin/section-panel.json" __S__ "$s" | jq --slurpfile c "$work/cols.json" "$FILL fill(\"__COLS__\"; \$c[0])" >> "$work/panels.ndjson"
 done
 jq -s '.' "$work/panels.ndjson" > "$work/panels.json"
 jq '[.. | objects | select(.id == "board_filter_panel") | .children[0].children[]]' "$admin/board_filter.v030.json" > "$work/exclusion.json"
 [ "$(jq 'length' "$work/exclusion.json")" -eq 4 ] || { echo "공통 제외 영역 노드 추출 실패" >&2; exit 2; }
-jq --indent 4 --slurpfile tabs "$work/tabs.json" --slurpfile rows "$work/rows.json" --slurpfile ex "$work/exclusion.json" --slurpfile panels "$work/panels.json" \
+# 관리자 화면 생성물은 한 줄(compact)로 쓴다 — 칸 10개 × 아이콘 선택지 141개라 들여쓰기하면 파일이 커진다.
+jq -c --slurpfile tabs "$work/tabs.json" --slurpfile rows "$work/rows.json" --slurpfile ex "$work/exclusion.json" --slurpfile panels "$work/panels.json" \
   "$FILL del(._comment) | fill(\"__TABS__\"; \$tabs[0]) | fill(\"__SECTION_ROWS__\"; \$rows[0]) | fill(\"__EXCLUSION__\"; \$ex[0]) | fill(\"__SECTION_PANELS__\"; \$panels[0])" \
   "$admin/page.base.json" > "$work/plugin_settings.json"
 

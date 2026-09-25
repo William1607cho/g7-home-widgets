@@ -74,7 +74,22 @@ class HomeLayoutFormTest extends TestCase
         $this->assertContains('in:recent,popular,ticker', $rules['home_layout_form.s3c1_type']);
         $this->assertContains('max:10', $rules['home_layout_form.s1c1_limit']);
         $this->assertContains('max:20', $rules['home_layout_form.s1c2_limit']);
-        // 폼 1 + 섹션 5×2(enabled·columns) + 칸 10×9(type·limit·mode·ids·ids.*·board·period·title·icon)
-        $this->assertSame(1 + 5 * 2 + 10 * 9, count($rules));
+        // 폼 1 + 섹션 5×2(enabled·columns) + 칸 10×10(type·limit·mode·ids·ids.*·board·period·title·icon·html)
+        $this->assertSame(1 + 5 * 2 + 10 * 10, count($rules));
+    }
+
+    public function test_icon_rule_uses_the_allow_list_when_given(): void
+    {
+        $rules = HomeLayoutForm::rules(['recent'], [], ['clock', 'fire']);
+
+        $this->assertContains('in:clock,fire', $rules['home_layout_form.s1c1_icon']);
+    }
+
+    public function test_html_round_trips_through_the_flat_form(): void
+    {
+        $flat = ['s1_enabled' => true, 's1_columns' => 1, 's1c1_type' => 'html', 's1c1_limit' => 1, 's1c1_html' => '<p>x</p>'];
+        $structure = HomeLayoutForm::toStructure($flat);
+
+        $this->assertSame('<p>x</p>', $structure['sections'][0]['cols'][0]['html']);
     }
 }

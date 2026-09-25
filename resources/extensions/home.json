@@ -723,6 +723,57 @@
                                                     "text": "{{col.empty_text}}"
                                                 }
                                             ]
+                                        },
+                                        {
+                                            "type": "basic",
+                                            "name": "Div",
+                                            "if": "{{col.type === 'html'}}",
+                                            "props": {
+                                                "className": "g7hw-w g7hw-w-html"
+                                            },
+                                            "children": [
+                                                {
+                                                    "type": "basic",
+                                                    "name": "Div",
+                                                    "props": {
+                                                        "className": "g7hw-head"
+                                                    },
+                                                    "children": [
+                                                        {
+                                                            "type": "basic",
+                                                            "name": "H3",
+                                                            "props": {
+                                                                "className": "g7hw-title"
+                                                            },
+                                                            "children": [
+                                                                {
+                                                                    "type": "basic",
+                                                                    "name": "Icon",
+                                                                    "props": {
+                                                                        "name": "{{col.icon}}",
+                                                                        "className": "g7hw-title-icon"
+                                                                    }
+                                                                },
+                                                                {
+                                                                    "type": "basic",
+                                                                    "name": "Span",
+                                                                    "text": "{{col.title}}"
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "type": "composite",
+                                                    "name": "HtmlContent",
+                                                    "if": "{{col.html}}",
+                                                    "props": {
+                                                        "content": "{{col.html}}",
+                                                        "isHtml": true,
+                                                        "className": "g7hw-html-body"
+                                                    }
+                                                }
+                                            ]
                                         }
                                     ]
                                 }

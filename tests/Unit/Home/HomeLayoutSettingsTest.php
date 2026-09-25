@@ -141,6 +141,20 @@ class HomeLayoutSettingsTest extends TestCase
         $this->assertSame(['mode' => 'only', 'ids' => [3]], $out['sections'][0]['cols'][0]['boards']);
     }
 
+    public function test_icons_outside_the_allow_list_fall_back_to_default(): void
+    {
+        $source = (new ReflectionClass(BoardPostsSource::class))->newInstanceWithoutConstructor();
+        $s = new HomeLayoutSettings(new WidgetRegistry([
+            new RecentWidget($source), new PopularWidget($source), new TickerWidget($source),
+        ]), ['clock', 'star']);
+        $out = $s->normalize(['sections' => [[
+            'enabled' => true, 'columns' => 2,
+            'cols' => [['type' => 'recent', 'icon' => 'star'], ['type' => 'recent', 'icon' => 'rocket']],
+        ]]], null);
+
+        $this->assertSame(['star', ''], array_column($out['sections'][0]['cols'], 'icon'));
+    }
+
     public function test_board_ids_are_capped(): void
     {
         $ids = HomeLayoutSettings::normalizeIds(range(1, HomeLayoutSettings::MAX_BOARD_IDS + 10));

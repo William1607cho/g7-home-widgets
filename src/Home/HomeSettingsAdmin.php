@@ -61,6 +61,10 @@ final class HomeSettingsAdmin
             foreach ($section['cols'] as $c => $col) {
                 $ids = array_values(array_filter($col['boards']['ids'], fn (int $id) => isset($active[$id])));
                 $layout['sections'][$i]['cols'][$c]['boards']['ids'] = $ids;
+                if (array_key_exists('html', $col)) {
+                    // 저장 시 정제(코어 HtmlSanitizer). 표시 때도 다시 정제된다.
+                    $layout['sections'][$i]['cols'][$c]['html'] = HomeHtml::sanitize((string) $col['html']);
+                }
             }
         }
         unset($settings[HomeLayoutForm::INPUT_KEY]);

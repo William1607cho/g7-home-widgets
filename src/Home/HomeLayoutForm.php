@@ -20,7 +20,7 @@ final class HomeLayoutForm
     public const INPUT_KEY = 'home_layout_form';
 
     /** 칸 평면 필드(접미사) */
-    public const COL_FIELDS = ['type', 'title', 'icon', 'limit', 'mode', 'ids', 'board', 'period'];
+    public const COL_FIELDS = ['type', 'title', 'icon', 'limit', 'mode', 'ids', 'board', 'period', 'html'];
 
     /**
      * 정리된 구조 → 평면 폼.
@@ -48,6 +48,7 @@ final class HomeLayoutForm
                 $flat[$k.'_ids'] = $ids;
                 $flat[$k.'_board'] = $col['type'] === 'ticker' && $ids !== [] ? (int) $ids[0] : null;
                 $flat[$k.'_period'] = $col['period'] ?? 'week';
+                $flat[$k.'_html'] = (string) ($col['html'] ?? '');
             }
         }
 
@@ -80,6 +81,7 @@ final class HomeLayoutForm
                         ? ['mode' => 'only', 'ids' => $board === null || $board === '' ? [] : [$board]]
                         : ['mode' => $flat[$k.'_mode'] ?? 'all', 'ids' => $flat[$k.'_ids'] ?? []],
                     'period' => $flat[$k.'_period'] ?? 'week',
+                    'html' => $flat[$k.'_html'] ?? '',
                 ];
             }
             $sections[] = ['enabled' => $flat[$s.'_enabled'] ?? false, 'columns' => $columns, 'cols' => $cols];
@@ -93,9 +95,10 @@ final class HomeLayoutForm
      *
      * @param  array<int, string>  $typeIds  고를 수 있는 종류 id
      * @param  array<string, mixed>  $input  요청 입력(티커 판정용)
+     * @param  array<int, string>  $icons  제목 아이콘 허용 목록(비면 이름 형식만)
      * @return array<string, array<int, mixed>>
      */
-    public static function rules(array $typeIds, array $input): array
+    public static function rules(array $typeIds, array $input, array $icons = []): array
     {
         $p = self::INPUT_KEY;
         $form = is_array($input[$p] ?? null) ? $input[$p] : [];
@@ -117,11 +120,26 @@ final class HomeLayoutForm
                 $rules[$k.'_board'] = ['nullable', self::tickerSingleBoard($isTicker), 'integer', 'min:1'];
                 $rules[$k.'_period'] = ['nullable', 'in:week,month,year'];
                 $rules[$k.'_title'] = ['nullable', 'string', 'max:'.HomeLayoutSettings::TITLE_MAX];
-                $rules[$k.'_icon'] = ['nullable', 'string', 'max:40'];
+                $rules[$k.'_icon'] = $icons === []
+                    ? ['nullable', 'string', 'max:40']
+                    : ['nullable', 'string', 'in:'.implode(',', $icons)];
+                $rules[$k.'_html'] = ['nullable', 'string', 'max:'.HomeHtml::MAX_LENGTH, self::sanitizerPresent()];
             }
         }
 
         return $rules;
+    }
+
+    /**
+     * HTML 을 저장하려면 코어 정제기가 있어야 한다(없으면 빈 값 저장이 아니라 거부).
+     */
+    private static function sanitizerPresent(): Closure
+    {
+        return static function (string $attribute, mixed $value, Closure $fail): void {
+            if (is_string($value) && $value !== '' && ! HomeHtml::available()) {
+                $fail(__('g7-home-widgets::messages.home.validation.html_unavailable'));
+            }
+        };
     }
 
     /**

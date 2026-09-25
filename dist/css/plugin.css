@@ -368,3 +368,40 @@
     font-size: 0.75rem;
     color: var(--g7hw-muted);
 }
+
+/* HTML 위젯 — 본문 기본 서식(템플릿 Tailwind 에 기대지 않는다) */
+.g7hw-w-html {
+    background: var(--g7hw-bg);
+    border: 1px solid var(--g7hw-border);
+    border-radius: 0.75rem;
+    padding: 1.25rem;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.g7hw-html-body {
+    overflow-wrap: anywhere;
+    font-size: 0.9375rem;
+    line-height: 1.7;
+    color: var(--g7hw-text);
+}
+
+.g7hw-html-body p,
+.g7hw-html-body ul,
+.g7hw-html-body ol {
+    margin: 0 0 0.75rem;
+}
+
+.g7hw-html-body ul,
+.g7hw-html-body ol {
+    padding-left: 1.25rem;
+}
+
+.g7hw-html-body a {
+    color: var(--g7hw-accent);
+    text-decoration: underline;
+}
+
+.g7hw-html-body img {
+    max-width: 100%;
+    height: auto;
+}

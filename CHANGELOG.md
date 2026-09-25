@@ -31,6 +31,16 @@ Development version `0.4.0` (staging only). Part 1 of the home sections rework.
   adds validation rules (a ticker with more than one board is rejected), converts the form into
   `home_layout` before saving, and clears the widget data cache and the cached bot home page after
   saving. New read endpoint `GET /api/plugins/g7-home-widgets/admin/home-form` (`core.plugins.read`).
+- **Gallery** widget — recent posts of the chosen boards as thumbnail cards (1–20 items). The
+  thumbnail is sirsoft-board's own list thumbnail (`PostResource`: image attachment first, then the
+  first image in the body); posts without one get a placeholder box; secret posts never show a
+  thumbnail. No image-delivery variants.
+- **HTML** widget — admin-written HTML, sanitized with the core `HtmlSanitizer` when saving and
+  again when shown (browser `HtmlContent`, bot pages). Scripts, event attributes and
+  `javascript:` links are removed.
+- **Title and icon per column** (all widget types). Icons are limited to the wc-community icon
+  subset (141 Font Awesome solid icons, `resources/home/icons.json`); others are rejected when
+  saving and ignored when reading.
 - `GET /api/plugins/g7-home-widgets/home` (public, `optional.sanctum`) — all enabled sections
   and their lists in one response.
 - Search-engine (bot) pages get the same data through the `core.seo.filter_context` filter, so
