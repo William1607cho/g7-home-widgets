@@ -61,7 +61,8 @@
         "types": {
             "recent": "Recent posts",
             "popular": "Popular posts",
-            "ticker": "News ticker"
+            "ticker": "News ticker",
+            "gallery": "Gallery"
         },
         "periods": {
             "week": "This Week",

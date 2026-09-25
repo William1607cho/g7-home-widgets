@@ -10,6 +10,7 @@ return [
             'recent' => '최근 게시글',
             'popular' => '인기글',
             'ticker' => '공지',
+            'gallery' => '갤러리',
         ],
         'periods' => [
             'week' => '이번주',
@@ -20,6 +21,7 @@ return [
             'recent' => '아직 게시글이 없습니다.',
             'popular' => '인기 게시글이 없습니다',
             'ticker' => '',
+            'gallery' => '아직 게시글이 없습니다.',
         ],
         'validation' => [
             'ticker_single_board' => '뉴스 티커는 게시판을 하나만 고를 수 있습니다.',

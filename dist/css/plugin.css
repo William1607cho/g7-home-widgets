@@ -289,3 +289,82 @@
         padding: 0.75rem 1.25rem;
     }
 }
+
+/* 갤러리 — 썸네일 카드 격자. 썸네일이 없는 글은 대체 틀(아이콘 칸) */
+.g7hw-w-gallery {
+    background: var(--g7hw-bg);
+    border: 1px solid var(--g7hw-border);
+    border-radius: 0.75rem;
+    padding: 1.25rem;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.g7hw-gallery {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+@media (min-width: 640px) {
+    .g7hw-gallery {
+        grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+    }
+}
+
+.g7hw-card-link {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+    color: inherit;
+    text-decoration: none;
+}
+
+.g7hw-thumb {
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 4 / 3;
+    border-radius: 0.5rem;
+    background: var(--g7hw-hover);
+}
+
+.g7hw-thumb-img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.2s ease;
+}
+
+.g7hw-card-link:hover .g7hw-thumb-img {
+    transform: scale(1.03);
+}
+
+.g7hw-thumb-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--g7hw-muted);
+}
+
+.g7hw-thumb-icon {
+    font-size: 1.5rem;
+    opacity: 0.6;
+}
+
+.g7hw-card-title {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--g7hw-text);
+}
+
+.g7hw-card-meta {
+    font-size: 0.75rem;
+    color: var(--g7hw-muted);
+}

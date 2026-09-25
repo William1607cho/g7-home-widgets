@@ -10,6 +10,7 @@ return [
             'recent' => 'Recent Posts',
             'popular' => 'Popular Posts',
             'ticker' => 'Notice',
+            'gallery' => 'Gallery',
         ],
         'periods' => [
             'week' => 'This Week',
@@ -20,6 +21,7 @@ return [
             'recent' => 'No posts yet.',
             'popular' => 'No popular posts',
             'ticker' => '',
+            'gallery' => 'No posts yet.',
         ],
         'validation' => [
             'ticker_single_board' => 'The news ticker can use only one board.',

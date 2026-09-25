@@ -1102,6 +1102,10 @@
                                                                         {
                                                                             "value": "ticker",
                                                                             "label": "$t:g7-home-widgets.home.types.ticker"
+                                                                        },
+                                                                        {
+                                                                            "value": "gallery",
+                                                                            "label": "$t:g7-home-widgets.home.types.gallery"
                                                                         }
                                                                     ]
                                                                 }
@@ -1373,6 +1377,10 @@
                                                                         {
                                                                             "value": "ticker",
                                                                             "label": "$t:g7-home-widgets.home.types.ticker"
+                                                                        },
+                                                                        {
+                                                                            "value": "gallery",
+                                                                            "label": "$t:g7-home-widgets.home.types.gallery"
                                                                         }
                                                                     ]
                                                                 }
@@ -1665,6 +1673,10 @@
                                                                         {
                                                                             "value": "ticker",
                                                                             "label": "$t:g7-home-widgets.home.types.ticker"
+                                                                        },
+                                                                        {
+                                                                            "value": "gallery",
+                                                                            "label": "$t:g7-home-widgets.home.types.gallery"
                                                                         }
                                                                     ]
                                                                 }
@@ -1936,6 +1948,10 @@
                                                                         {
                                                                             "value": "ticker",
                                                                             "label": "$t:g7-home-widgets.home.types.ticker"
+                                                                        },
+                                                                        {
+                                                                            "value": "gallery",
+                                                                            "label": "$t:g7-home-widgets.home.types.gallery"
                                                                         }
                                                                     ]
                                                                 }
@@ -2228,6 +2244,10 @@
                                                                         {
                                                                             "value": "ticker",
                                                                             "label": "$t:g7-home-widgets.home.types.ticker"
+                                                                        },
+                                                                        {
+                                                                            "value": "gallery",
+                                                                            "label": "$t:g7-home-widgets.home.types.gallery"
                                                                         }
                                                                     ]
                                                                 }
@@ -2499,6 +2519,10 @@
                                                                         {
                                                                             "value": "ticker",
                                                                             "label": "$t:g7-home-widgets.home.types.ticker"
+                                                                        },
+                                                                        {
+                                                                            "value": "gallery",
+                                                                            "label": "$t:g7-home-widgets.home.types.gallery"
                                                                         }
                                                                     ]
                                                                 }
@@ -2791,6 +2815,10 @@
                                                                         {
                                                                             "value": "ticker",
                                                                             "label": "$t:g7-home-widgets.home.types.ticker"
+                                                                        },
+                                                                        {
+                                                                            "value": "gallery",
+                                                                            "label": "$t:g7-home-widgets.home.types.gallery"
                                                                         }
                                                                     ]
                                                                 }
@@ -3062,6 +3090,10 @@
                                                                         {
                                                                             "value": "ticker",
                                                                             "label": "$t:g7-home-widgets.home.types.ticker"
+                                                                        },
+                                                                        {
+                                                                            "value": "gallery",
+                                                                            "label": "$t:g7-home-widgets.home.types.gallery"
                                                                         }
                                                                     ]
                                                                 }
@@ -3354,6 +3386,10 @@
                                                                         {
                                                                             "value": "ticker",
                                                                             "label": "$t:g7-home-widgets.home.types.ticker"
+                                                                        },
+                                                                        {
+                                                                            "value": "gallery",
+                                                                            "label": "$t:g7-home-widgets.home.types.gallery"
                                                                         }
                                                                     ]
                                                                 }
@@ -3625,6 +3661,10 @@
                                                                         {
                                                                             "value": "ticker",
                                                                             "label": "$t:g7-home-widgets.home.types.ticker"
+                                                                        },
+                                                                        {
+                                                                            "value": "gallery",
+                                                                            "label": "$t:g7-home-widgets.home.types.gallery"
                                                                         }
                                                                     ]
                                                                 }

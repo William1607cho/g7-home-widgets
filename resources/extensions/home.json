@@ -577,6 +577,152 @@
                                                     ]
                                                 }
                                             ]
+                                        },
+                                        {
+                                            "type": "basic",
+                                            "name": "Div",
+                                            "if": "{{col.type === 'gallery'}}",
+                                            "props": {
+                                                "className": "g7hw-w g7hw-w-gallery"
+                                            },
+                                            "children": [
+                                                {
+                                                    "type": "basic",
+                                                    "name": "Div",
+                                                    "props": {
+                                                        "className": "g7hw-head"
+                                                    },
+                                                    "children": [
+                                                        {
+                                                            "type": "basic",
+                                                            "name": "H3",
+                                                            "props": {
+                                                                "className": "g7hw-title"
+                                                            },
+                                                            "children": [
+                                                                {
+                                                                    "type": "basic",
+                                                                    "name": "Icon",
+                                                                    "props": {
+                                                                        "name": "{{col.icon}}",
+                                                                        "className": "g7hw-title-icon"
+                                                                    }
+                                                                },
+                                                                {
+                                                                    "type": "basic",
+                                                                    "name": "Span",
+                                                                    "text": "{{col.title}}"
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "type": "basic",
+                                                    "name": "Ul",
+                                                    "if": "{{col.items && col.items.length > 0}}",
+                                                    "props": {
+                                                        "className": "g7hw-gallery"
+                                                    },
+                                                    "children": [
+                                                        {
+                                                            "type": "basic",
+                                                            "name": "Li",
+                                                            "iteration": {
+                                                                "source": "{{col.items ?? []}}",
+                                                                "item_var": "item"
+                                                            },
+                                                            "props": {
+                                                                "className": "g7hw-item g7hw-card"
+                                                            },
+                                                            "children": [
+                                                                {
+                                                                    "type": "basic",
+                                                                    "name": "A",
+                                                                    "props": {
+                                                                        "className": "g7hw-link g7hw-card-link",
+                                                                        "href": "/board/{{item.board_slug}}/{{item.id}}"
+                                                                    },
+                                                                    "actions": [
+                                                                        {
+                                                                            "type": "click",
+                                                                            "handler": "navigate",
+                                                                            "params": {
+                                                                                "path": "/board/{{item.board_slug}}/{{item.id}}"
+                                                                            }
+                                                                        }
+                                                                    ],
+                                                                    "children": [
+                                                                        {
+                                                                            "type": "basic",
+                                                                            "name": "Div",
+                                                                            "if": "{{item.has_thumbnail}}",
+                                                                            "props": {
+                                                                                "className": "g7hw-thumb"
+                                                                            },
+                                                                            "children": [
+                                                                                {
+                                                                                    "type": "basic",
+                                                                                    "name": "Img",
+                                                                                    "props": {
+                                                                                        "src": "{{item.thumbnail}}",
+                                                                                        "alt": "",
+                                                                                        "loading": "lazy",
+                                                                                        "className": "g7hw-thumb-img"
+                                                                                    }
+                                                                                }
+                                                                            ]
+                                                                        },
+                                                                        {
+                                                                            "type": "basic",
+                                                                            "name": "Div",
+                                                                            "if": "{{!item.has_thumbnail}}",
+                                                                            "props": {
+                                                                                "className": "g7hw-thumb g7hw-thumb-empty"
+                                                                            },
+                                                                            "children": [
+                                                                                {
+                                                                                    "type": "basic",
+                                                                                    "name": "Icon",
+                                                                                    "props": {
+                                                                                        "name": "{{item.is_secret ? 'lock' : 'image'}}",
+                                                                                        "className": "g7hw-thumb-icon"
+                                                                                    }
+                                                                                }
+                                                                            ]
+                                                                        },
+                                                                        {
+                                                                            "type": "basic",
+                                                                            "name": "Span",
+                                                                            "props": {
+                                                                                "className": "g7hw-card-title"
+                                                                            },
+                                                                            "text": "{{item.title}}"
+                                                                        },
+                                                                        {
+                                                                            "type": "basic",
+                                                                            "name": "Span",
+                                                                            "props": {
+                                                                                "className": "g7hw-card-meta"
+                                                                            },
+                                                                            "text": "{{item.board_name}} · {{item.created_at_formatted ?? ''}}"
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "type": "basic",
+                                                    "name": "P",
+                                                    "if": "{{!col.items || col.items.length === 0}}",
+                                                    "props": {
+                                                        "className": "g7hw-empty"
+                                                    },
+                                                    "text": "{{col.empty_text}}"
+                                                }
+                                            ]
                                         }
                                     ]
                                 }

@@ -5,6 +5,7 @@ namespace Plugins\G7\Home\Widgets\Providers;
 use App\Extension\BasePluginServiceProvider;
 use Plugins\G7\Home\Widgets\Home\WidgetCache;
 use Plugins\G7\Home\Widgets\Home\WidgetRegistry;
+use Plugins\G7\Home\Widgets\Home\Widgets\GalleryWidget;
 use Plugins\G7\Home\Widgets\Home\Widgets\PopularWidget;
 use Plugins\G7\Home\Widgets\Home\Widgets\RecentWidget;
 use Plugins\G7\Home\Widgets\Home\Widgets\TickerWidget;
@@ -28,6 +29,7 @@ class HomeWidgetsServiceProvider extends BasePluginServiceProvider
         RecentWidget::class,
         PopularWidget::class,
         TickerWidget::class,
+        GalleryWidget::class,
     ];
 
     public function register(): void

@@ -61,7 +61,8 @@
         "types": {
             "recent": "최근글",
             "popular": "인기글",
-            "ticker": "뉴스 티커"
+            "ticker": "뉴스 티커",
+            "gallery": "갤러리"
         },
         "periods": {
             "week": "이번주",
