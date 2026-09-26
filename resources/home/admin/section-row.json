@@ -76,7 +76,7 @@
             "type": "basic",
             "name": "Div",
             "props": {
-                "className": "flex items-center gap-2"
+                "className": "flex items-center gap-2 g7hw-admin-cols"
             },
             "children": [
                 {
@@ -95,6 +95,7 @@
                         "id": "s__S___columns",
                         "name": "s__S___columns",
                         "className": "input",
+                        "data-hw-cols-select": "s__S__",
                         "options": [
                             { "value": 1, "label": "$t:g7-home-widgets.home.layout.one" },
                             { "value": 2, "label": "$t:g7-home-widgets.home.layout.two" }
