@@ -72,7 +72,8 @@ stamp() { # 파일 [찾을 문자열 바꿀 문자열]... → 모든 문자열 �
   done
   jq "${args[@]}" "$prog" "$f"
 }
-jq -c '[.[] | {value: ., label: ("$t:g7-home-widgets.home.types." + .)}]' "$registry" > "$work/type_opts.json"
+# 종류 선택지: 쓸 수 없는 종류(애드온 의존 — 웹진)는 비활성 선택지로. 판정은 메타 type_available(서버).
+jq -c '[.[] | {value: ., label: ("$t:g7-home-widgets.home.types." + .), disabled: ("{{homeMeta?.data?.type_available?." + . + " === false}}")}]' "$registry" > "$work/type_opts.json"
 for t in layout s1 s2 s3 s4 s5; do stamp "$admin/tab.json" __TAB__ "$t"; done | jq -s '.' > "$work/tabs.json"
 for s in 1 2 3 4 5; do stamp "$admin/section-row.json" __S__ "$s"; done | jq -s '.' > "$work/rows.json"
 for s in 1 2 3 4 5; do stamp "$admin/preview-box.json" __S__ "$s" | jq 'del(._comment)'; done | jq -s '.' > "$work/boxes.json"

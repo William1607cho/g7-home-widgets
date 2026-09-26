@@ -11,6 +11,7 @@ return [
             'popular' => '인기글',
             'ticker' => '공지',
             'gallery' => '갤러리',
+            'webzine' => '웹진',
             'html' => '알림판',
         ],
         'periods' => [
@@ -23,6 +24,7 @@ return [
             'popular' => '인기 게시글이 없습니다',
             'ticker' => '',
             'gallery' => '아직 게시글이 없습니다.',
+            'webzine' => '아직 게시글이 없습니다.',
             'html' => '',
         ],
         'validation' => [

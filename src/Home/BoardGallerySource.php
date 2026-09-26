@@ -8,7 +8,7 @@ use Modules\Sirsoft\Board\Services\BoardService;
 use Modules\Sirsoft\Board\Services\PostService;
 
 /**
- * 갤러리 위젯용 게시판 글 목록(0.4.0) — 코어 게시판 목록 경로를 그대로 따른다.
+ * 갤러리·웹진 위젯용 게시판 글 목록(0.4.0) — 코어 게시판 목록 경로를 그대로 따른다.
  *
  * 코어 사용자 목록 화면(`User\PostController::index`)과 같은 순서로 부른다:
  * `PostService::buildListParams()` → `PostService::getPosts(…, 'user', $board)` → board 관계 주입 →
@@ -40,7 +40,8 @@ final class BoardGallerySource
     {
         $load = fn () => $this->load($board['slug']);
 
-        return Auth::check() ? $load() : $this->cache->remember('gallery:'.$board['id'].':'.self::POOL, $load);
+        // 키 접두 gallery2: 웹진 묶음에서 항목에 분류(category)를 더했다 — 분류 없는 옛 캐시를 읽지 않게.
+        return Auth::check() ? $load() : $this->cache->remember('gallery2:'.$board['id'].':'.self::POOL, $load);
     }
 
     /**
@@ -66,6 +67,7 @@ final class BoardGallerySource
             $rows[] = [
                 'id' => (int) $r['id'],
                 'title' => (string) ($r['title'] ?? ''),
+                'category' => $r['category'] ?? null,
                 'is_secret' => $secret,
                 'thumbnail' => $secret ? null : ($r['thumbnail'] ?? null),
                 'created_at' => $r['created_at'] ?? '',

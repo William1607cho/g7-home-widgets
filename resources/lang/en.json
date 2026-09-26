@@ -88,13 +88,18 @@
             "select_none": "Deselect all",
             "select_none_help": "Move every board to 'Not included'. With a search term, only the matching boards move.",
             "html": "HTML",
-            "html_help": "HTML only. Scripts, event attributes (onclick, ...) and javascript: links are removed both when saving and when showing."
+            "html_help": "HTML only. Scripts, event attributes (onclick, ...) and javascript: links are removed both when saving and when showing.",
+            "webzine_unavailable": "The webzine style is available when g7-webzine-addon is installed.",
+            "webzine_unavailable_help": "While the add-on is missing or turned off, columns already saved as webzine show recent posts on the home page instead, and switch back once the add-on is on again.",
+            "webzine_link": "g7-webzine-addon repository",
+            "webzine_preview_alt": "Webzine-style widget preview"
         },
         "types": {
             "recent": "Recent posts",
             "popular": "Popular posts",
             "ticker": "News ticker",
             "gallery": "Gallery",
+            "webzine": "Webzine style",
             "html": "HTML"
         },
         "periods": {

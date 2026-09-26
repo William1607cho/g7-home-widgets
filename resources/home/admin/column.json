@@ -36,6 +36,74 @@
                         "className": "input w-full",
                         "options": "__TYPE_OPTIONS__"
                     }
+                },
+                {
+                    "type": "basic",
+                    "name": "Div",
+                    "if": "{{homeMeta?.data?.type_available?.webzine === false}}",
+                    "props": {
+                        "className": "mt-2 flex flex-wrap items-start gap-3 p-3 rounded-lg border border-dashed border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-900/30",
+                        "data-testid": "g7hw-admin-__K__-webzine-off"
+                    },
+                    "children": [
+                        {
+                            "type": "basic",
+                            "name": "Img",
+                            "props": {
+                                "src": "/api/plugins/assets/g7-home-widgets/resources/assets/webzine-preview.webp",
+                                "alt": "$t:g7-home-widgets.home.col.webzine_preview_alt",
+                                "loading": "lazy",
+                                "width": 200,
+                                "className": "rounded border border-gray-200 dark:border-gray-700",
+                                "style": {
+                                    "width": "200px",
+                                    "maxWidth": "100%",
+                                    "height": "auto"
+                                }
+                            }
+                        },
+                        {
+                            "type": "basic",
+                            "name": "Div",
+                            "props": {
+                                "className": "space-y-1 text-sm",
+                                "style": {
+                                    "flex": "1 1 12rem",
+                                    "minWidth": "0"
+                                }
+                            },
+                            "children": [
+                                {
+                                    "type": "basic",
+                                    "name": "P",
+                                    "props": {
+                                        "className": "font-medium text-gray-900 dark:text-white"
+                                    },
+                                    "text": "$t:g7-home-widgets.home.col.webzine_unavailable"
+                                },
+                                {
+                                    "type": "basic",
+                                    "name": "P",
+                                    "props": {
+                                        "className": "text-gray-500 dark:text-gray-400"
+                                    },
+                                    "text": "$t:g7-home-widgets.home.col.webzine_unavailable_help"
+                                },
+                                {
+                                    "type": "basic",
+                                    "name": "A",
+                                    "props": {
+                                        "href": "{{homeMeta?.data?.webzine_repository ?? ''}}",
+                                        "target": "_blank",
+                                        "rel": "noopener noreferrer",
+                                        "className": "text-blue-600 dark:text-blue-400 underline",
+                                        "data-testid": "g7hw-admin-__K__-webzine-link"
+                                    },
+                                    "text": "$t:g7-home-widgets.home.col.webzine_link"
+                                }
+                            ]
+                        }
+                    ]
                 }
             ]
         },
@@ -423,7 +491,7 @@
         {
             "type": "basic",
             "name": "Div",
-            "if": "{{['recent', 'popular', 'gallery'].includes(_local.form?.__K___type)}}",
+            "if": "{{['recent', 'popular', 'gallery', 'webzine'].includes(_local.form?.__K___type)}}",
             "props": {
                 "className": "space-y-3",
                 "data-testid": "g7hw-admin-__K__-boards"

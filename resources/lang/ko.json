@@ -88,13 +88,18 @@
             "select_none": "전체 해제",
             "select_none_help": "모든 게시판을 '포함 안 함'으로 옮깁니다. 검색어가 있으면 검색된 게시판만 옮깁니다.",
             "html": "HTML",
-            "html_help": "HTML 만 넣을 수 있습니다. 스크립트·이벤트 속성(onclick 등)·javascript: 링크는 저장할 때와 보여줄 때 모두 제거됩니다."
+            "html_help": "HTML 만 넣을 수 있습니다. 스크립트·이벤트 속성(onclick 등)·javascript: 링크는 저장할 때와 보여줄 때 모두 제거됩니다.",
+            "webzine_unavailable": "웹진 스타일은 g7-webzine-addon 설치 시 사용 가능합니다.",
+            "webzine_unavailable_help": "애드온이 없거나 꺼져 있으면 이미 웹진으로 저장한 칸은 홈 화면에서 최근글로 대신 보이고, 애드온이 다시 켜지면 웹진으로 돌아옵니다.",
+            "webzine_link": "g7-webzine-addon 저장소",
+            "webzine_preview_alt": "웹진 스타일 위젯 미리보기"
         },
         "types": {
             "recent": "최근글",
             "popular": "인기글",
             "ticker": "뉴스 티커",
             "gallery": "갤러리",
+            "webzine": "웹진 스타일",
             "html": "HTML"
         },
         "periods": {

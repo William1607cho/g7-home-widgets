@@ -369,6 +369,91 @@
     color: var(--g7hw-muted);
 }
 
+/* 웹진 스타일 — 왼쪽 정사각 썸네일 + 제목·요약·게시판·분류·날짜. 1단·2단 칸 모두, 좁은 화면은 썸네일을 줄인다 */
+.g7hw-w-webzine {
+    background: var(--g7hw-bg);
+    border: 1px solid var(--g7hw-border);
+    border-radius: 0.75rem;
+    padding: 1.25rem;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.g7hw-webzine {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.g7hw-wz-row + .g7hw-wz-row {
+    border-top: 1px solid var(--g7hw-divider);
+}
+
+.g7hw-wz-link {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.875rem;
+    padding: 0.75rem 0;
+    color: inherit;
+    text-decoration: none;
+}
+
+.g7hw-wz-thumb {
+    position: relative;
+    flex: none;
+    width: 5rem;
+    height: 5rem;
+    overflow: hidden;
+    border-radius: 0.5rem;
+    background: var(--g7hw-hover);
+}
+
+.g7hw-wz-link:hover .g7hw-thumb-img {
+    transform: scale(1.03);
+}
+
+.g7hw-wz-body {
+    display: flex;
+    flex: 1 1 0%;
+    flex-direction: column;
+    gap: 0.25rem;
+    min-width: 0;
+}
+
+.g7hw-wz-title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--g7hw-text);
+}
+
+.g7hw-wz-link:hover .g7hw-wz-title {
+    color: var(--g7hw-accent);
+}
+
+.g7hw-wz-summary {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    color: var(--g7hw-muted);
+    overflow-wrap: anywhere;
+}
+
+.g7hw-wz-date {
+    margin-left: auto;
+}
+
+@media (max-width: 639px) {
+    .g7hw-wz-thumb {
+        width: 4rem;
+        height: 4rem;
+    }
+}
+
 /* HTML 위젯 — 본문 기본 서식(템플릿 Tailwind 에 기대지 않는다) */
 .g7hw-w-html {
     background: var(--g7hw-bg);

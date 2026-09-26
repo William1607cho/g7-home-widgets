@@ -23,7 +23,7 @@ final class HomeLayoutForm
     public const INPUT_KEY = 'home_layout_form';
 
     /** 게시판 여러 개를 쓰는 목록 위젯(포함 안 함 목록으로 저장) */
-    public const MANY_TYPES = ['recent', 'popular', 'gallery'];
+    public const MANY_TYPES = ['recent', 'popular', 'gallery', 'webzine'];
 
     /** 목록 위젯 개수 범위(확정 사항: 전부 1~20) */
     public const LIMIT_MIN = 1;

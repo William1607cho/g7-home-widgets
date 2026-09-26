@@ -11,6 +11,7 @@ return [
             'popular' => 'Popular Posts',
             'ticker' => 'Notice',
             'gallery' => 'Gallery',
+            'webzine' => 'Webzine',
             'html' => 'Board',
         ],
         'periods' => [
@@ -23,6 +24,7 @@ return [
             'popular' => 'No popular posts',
             'ticker' => '',
             'gallery' => 'No posts yet.',
+            'webzine' => 'No posts yet.',
             'html' => '',
         ],
         'validation' => [

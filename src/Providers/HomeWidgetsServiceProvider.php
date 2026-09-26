@@ -12,6 +12,8 @@ use Plugins\G7\Home\Widgets\Home\Widgets\HtmlWidget;
 use Plugins\G7\Home\Widgets\Home\Widgets\PopularWidget;
 use Plugins\G7\Home\Widgets\Home\Widgets\RecentWidget;
 use Plugins\G7\Home\Widgets\Home\Widgets\TickerWidget;
+use Plugins\G7\Home\Widgets\Home\Widgets\WebzineWidget;
+use Plugins\G7\Home\Widgets\Home\WebzineAddon;
 
 /**
  * 홈 화면 위젯 모음 서비스 프로바이더.
@@ -33,6 +35,7 @@ class HomeWidgetsServiceProvider extends BasePluginServiceProvider
         PopularWidget::class,
         TickerWidget::class,
         GalleryWidget::class,
+        WebzineWidget::class,
         HtmlWidget::class,
     ];
 
@@ -41,6 +44,8 @@ class HomeWidgetsServiceProvider extends BasePluginServiceProvider
         parent::register();
 
         $this->app->singleton(WidgetCache::class);
+        // 웹진 애드온 유무 판정은 요청 단위로만 기억한다(활성·비활성 직후 다음 요청에 반영).
+        $this->app->scoped(WebzineAddon::class);
         $this->app->singleton(WidgetRegistry::class, fn ($app) => new WidgetRegistry(
             array_map(fn (string $class) => $app->make($class), self::WIDGETS)
         ));

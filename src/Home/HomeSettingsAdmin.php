@@ -43,9 +43,10 @@ final class HomeSettingsAdmin
     }
 
     /**
-     * 화면용 메타: 활성 게시판(칩·티커 선택지), 제목 아이콘 허용 목록(격자 선택기), 종류별 기본 아이콘(격자 첫 칸).
+     * 화면용 메타: 활성 게시판(칩·티커 선택지), 제목 아이콘 허용 목록(격자 선택기), 종류별 기본 아이콘(격자 첫 칸),
+     * 종류별 사용 가능 여부(애드온 의존 종류 — 웹진 — 는 없으면 비활성 선택지), 웹진 애드온 저장소 주소(안내 링크).
      *
-     * @return array{boards: array<int, array{id: int, name: string, slug: string}>, icons: array<int, string>, type_icons: array<string, string>}
+     * @return array{boards: array<int, array{id: int, name: string, slug: string}>, icons: array<int, string>, type_icons: array<string, string>, type_available: array<string, bool>, webzine_repository: string}
      */
     public function meta(): array
     {
@@ -56,11 +57,15 @@ final class HomeSettingsAdmin
         ])->values()->all();
 
         $typeIcons = [];
+        $typeAvailable = [];
         foreach ($this->registry->ids() as $id) {
-            $typeIcons[$id] = $this->registry->get($id)->defaultIcon();
+            $widget = $this->registry->get($id);
+            $typeIcons[$id] = $widget->defaultIcon();
+            $typeAvailable[$id] = $widget->available();
         }
 
-        return ['boards' => $boards, 'icons' => HomeIcons::load(), 'type_icons' => $typeIcons];
+        return ['boards' => $boards, 'icons' => HomeIcons::load(), 'type_icons' => $typeIcons,
+            'type_available' => $typeAvailable, 'webzine_repository' => WebzineAddon::REPOSITORY_URL];
     }
 
     /**
