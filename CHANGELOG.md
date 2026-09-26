@@ -42,7 +42,10 @@ Development version `0.4.0` (staging only). Part 1 of the home sections rework.
     the "not included" list so new boards are included automatically; ticker: one board) or the
     HTML box.
   - Clicking outside an open select box or icon grid only closes it (the click does not reach the
-    element underneath). Form keys left over from another admin screen are dropped on arrival. Saving goes through the core plugin settings endpoint; the plugin
+    element underneath). Form keys left over from another admin screen are dropped on arrival.
+  - The Columns select on the Widget Layout tab has a fixed width that fits its longest option on
+    one line (the opened list uses the same width); on narrow screens it follows the row width.
+  Saving goes through the core plugin settings endpoint; the plugin
   adds validation rules (items 1–20, a ticker with more than one board is rejected), converts the
   form into `home_layout` before saving, never touches `excluded_board_ids`, and clears the widget
   data cache and the cached bot home page after saving. New read endpoints
@@ -54,6 +57,20 @@ Development version `0.4.0` (staging only). Part 1 of the home sections rework.
   thumbnail is sirsoft-board's own list thumbnail (`PostResource`: image attachment first, then the
   first image in the body); posts without one get a placeholder box; secret posts never show a
   thumbnail. No image-delivery variants.
+- **Webzine style** widget (needs g7-webzine-addon 1.3.0+) — recent posts of the chosen boards as a
+  list: thumbnail, title, summary, board name and category (no category on wiki boards) and date,
+  1–20 items. Posts come from the same core path as the gallery (readable boards, `PostService`,
+  `PostResource`); only the summary and thumbnail come from the add-on's public contract
+  `WebzineCards::cards()` — no add-on internals are used. Secret posts show the title only, a lock
+  in the thumbnail slot and no summary; posts without a thumbnail get the gallery's empty frame.
+  - Add-on presence = the core reports the plugin active **and** the contract class exists with
+    `VERSION >= 1`; checked once per request, so turning the add-on on or off shows on the next
+    request.
+  - Without the add-on the type is a disabled choice in the admin screen, with a small preview
+    image (`resources/assets/webzine-preview.webp`, bundled, no external request — replace the
+    file to change it), a note and a link to the add-on repository. Columns already saved as
+    webzine are drawn as recent posts (browser and bot) and switch back when the add-on returns;
+    the saved settings are not changed.
 - **HTML** widget — admin-written HTML, sanitized with the core `HtmlSanitizer` when saving and
   again when shown (browser `HtmlContent`, bot pages). Scripts, event attributes and
   `javascript:` links are removed.
