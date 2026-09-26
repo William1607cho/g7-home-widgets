@@ -23,14 +23,23 @@ Development version `0.4.0` (staging only). Part 1 of the home sections rework.
     same as the template widgets (Recent Posts · clock, Popular Posts · fire, Notice · bullhorn).
   - Settings key `home_layout` (plugin settings file). When it is absent the defaults above are
     used; nothing is written on update.
-- **Admin screen** (`/admin/plugins/g7-home-widgets/settings`, same menu entry) rebuilt with tabs:
-  **Widget Layout** (each section on/off and 1 or 2 columns; the common excluded boards editor
-  from 0.3.0 at the bottom) and **Section 1–5** (per column: widget type, number of items, and
-  boards — all boards or picked boards for recent/popular, a single board for the ticker; default
-  period tab for popular posts). Saving goes through the core plugin settings endpoint; the plugin
-  adds validation rules (a ticker with more than one board is rejected), converts the form into
-  `home_layout` before saving, and clears the widget data cache and the cached bot home page after
-  saving. New read endpoint `GET /api/plugins/g7-home-widgets/admin/home-form` (`core.plugins.read`).
+- **Admin screen "Home Page Settings"** (`/admin/plugins/g7-home-widgets/settings`, same menu
+  entry) with tabs **Widget Layout** (each section on/off and 1 or 2 columns) and **Section 1–5**.
+  Every tab is split 3 : 7 — a guide on the left (an image slot plus a short explanation of where
+  the section sits on the home page; drop `resources/assets/admin-guide/<layout|section-1…5>.webp`
+  (or .png/.jpg) into the plugin to show a picture, otherwise a placeholder box) and the settings
+  on the right; it stacks on narrow screens. A section tab shows one card per column (left/right
+  for two columns): widget type → title and icon → number of items (1–20) → board choice (recent,
+  popular, gallery: the 0.3.0 card screen with search, "Included" / "Not included" areas, drag or
+  X / + buttons, saved as the "not included" list so new boards are included automatically; ticker:
+  one board) or the HTML box. Saving goes through the core plugin settings endpoint; the plugin
+  adds validation rules (items 1–20, a ticker with more than one board is rejected), converts the
+  form into `home_layout` before saving, never touches `excluded_board_ids`, and clears the widget
+  data cache and the cached bot home page after saving. New read endpoints
+  `GET /api/plugins/g7-home-widgets/admin/home-form` and `admin/home-meta` (`core.plugins.read`).
+- Recent and popular posts show "board name · category"; posts on wiki boards (the boards listed in
+  g7-light-wiki's `wiki_boards` setting, read through the core settings helper) show the board name
+  only.
 - **Gallery** widget — recent posts of the chosen boards as thumbnail cards (1–20 items). The
   thumbnail is sirsoft-board's own list thumbnail (`PostResource`: image attachment first, then the
   first image in the body); posts without one get a placeholder box; secret posts never show a
@@ -50,14 +59,15 @@ Development version `0.4.0` (staging only). Part 1 of the home sections rework.
 
 ### Changed
 
-- Which boards a widget shows = the boards the viewer can read (decided by sirsoft-board) ∩ the
-  widget's selection − the common excluded list (`excluded_board_ids`). Read permission,
-  secret and deleted posts are still decided by sirsoft-board; popular posts come from the
-  sirsoft-board popular cache (a narrow board selection can return fewer items than the limit).
+- Each widget has its own board choice; there is no common excluded list for the new sections.
+  Which boards a widget shows = the boards the viewer can read (decided by sirsoft-board) minus
+  the widget's "not included" list (recent, popular, gallery) or its one board (ticker). Read
+  permission, secret and deleted posts are still decided by sirsoft-board; popular posts come from
+  the sirsoft-board popular cache (a narrow board selection can return fewer items than the limit).
   A missing board name on a popular post is filled from the readable-board list already loaded.
-- The news ticker uses exactly one board and is **not** affected by the common excluded list
-  (only read permission applies), so a notice board that is hidden from the other widgets still
-  feeds the ticker.
+- Migration without rewriting the settings file: a list widget with no saved choice uses the old
+  `excluded_board_ids` as its "not included" list, so the home page looks the same until the new
+  screen is saved. `excluded_board_ids` stays (the three old widget APIs still use it).
 - Widget data cache keys carry a generation number. Post create/update/delete/blind/restore,
   board updates and saving this plugin's settings bump it, so a bot page re-rendered right after
   a new post no longer shows the old list for the bot cache lifetime. Saving this plugin's

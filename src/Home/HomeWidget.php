@@ -61,9 +61,10 @@ interface HomeWidget
     public function rules(string $prefix): array;
 
     /**
-     * 공통 제외 목록(`excluded_board_ids`)을 적용하는가. 티커는 고른 게시판 1개를 그대로 쓰므로 거짓.
+     * 게시판 선택 방식: `many`(목록 위젯 — 포함 안 함 목록, 새 게시판 자동 포함), `one`(티커 — 게시판 1개),
+     * `none`(HTML — 게시판 없음).
      */
-    public function appliesCommonExclusion(): bool;
+    public function boardSelection(): string;
 
     /**
      * 지금 고를 수 있는 종류인가(애드온 의존 종류용).

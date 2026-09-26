@@ -11,20 +11,32 @@ use Plugins\G7\Home\Widgets\Support\BoardFilterSettings;
  * - {@see self::form()}: 현재 저장값(없으면 기본값)을 평면 폼으로. `GET admin/home-form` 이 쓴다.
  * - {@see self::prepareForSave()}: 코어 설정 저장 경로의 저장 전 필터(`core.plugin_settings.filter_save_data`)가
  *   부른다. 요청의 `home_layout_form` 을 `home_layout` 구조로 바꾸고 정리한 뒤 평면 키는 버린다.
- *   고를 수 있는 게시판 id 는 활성 게시판으로 좁힌다(없는 id 제거). 공통 제외 목록은 0.3.0 과 같은
- *   정리만 한다.
+ *   고를 수 있는 게시판 id 는 활성 게시판으로 좁힌다(없는 id 제거).
+ * - **`excluded_board_ids` 는 새 화면 저장에서 절대 건드리지 않는다**(옛 위젯 API 3종이 계속 쓴다). 요청에
+ *   섞여 와도 버려서 코어 저장 병합이 기존 값을 그대로 남기게 한다({@see HomeLayoutForm::keepLegacyKey()}).
+ *   0.3.0 게시판 제외 API(`PUT admin/board-filter`) 경로는 예전처럼 이 키만 저장한다.
+ * - {@see self::meta()}: 화면용 활성 게시판 목록과 안내 이미지 주소. `GET admin/home-meta`.
  *
  * 게시판 목록은 코어 `BoardService::getActiveBoards()` 로만 얻는다(이 클래스는 쿼리를 쓰지 않는다).
  */
 final class HomeSettingsAdmin
 {
+    /** 안내 이미지 자리(탭별 1개) — 플러그인 루트 기준 폴더 */
+    public const GUIDE_DIR = 'resources/assets/admin-guide';
+
+    /** 안내 이미지 이름(탭 키 → 파일 이름 앞부분) */
+    public const GUIDE_NAMES = ['layout' => 'layout', 's1' => 'section-1', 's2' => 'section-2', 's3' => 'section-3', 's4' => 'section-4', 's5' => 'section-5'];
+
+    /** 안내 이미지 형식(앞에서부터 찾는다) */
+    public const GUIDE_EXTENSIONS = ['webp', 'png', 'jpg'];
+
     public function __construct(
         private readonly HomeLayoutSettings $settings,
         private readonly BoardService $boards,
     ) {}
 
     /**
-     * 현재 설정의 평면 폼 + 공통 제외 목록.
+     * 현재 설정의 평면 폼.
      *
      * @return array<string, mixed>
      */
@@ -32,10 +44,39 @@ final class HomeSettingsAdmin
     {
         $all = function_exists('plugin_settings') ? plugin_settings(BoardFilterSettings::IDENTIFIER) : [];
         $raw = is_array($all) ? ($all[HomeLayoutSettings::KEY] ?? null) : null;
-        $layout = $this->settings->normalize($raw, $this->activeIdBySlug(HomeLayoutService::DEFAULT_TICKER_SLUG));
+        $settings = $this->settings->withLegacyExcluded(BoardFilterSettings::excludedIds());
+        $layout = $settings->normalize($raw, $this->activeIdBySlug(HomeLayoutService::DEFAULT_TICKER_SLUG));
 
-        return HomeLayoutForm::toFlat($layout, $this->settings->defaultCol('recent'))
-            + ['excluded_board_ids' => BoardFilterSettings::excludedIds()];
+        return HomeLayoutForm::toFlat($layout, $settings->defaultCol('recent'), $this->activeIds());
+    }
+
+    /**
+     * 화면용 메타: 활성 게시판(칩·티커 선택지)과 탭별 안내 이미지 주소(없으면 null → 자리표시 틀).
+     *
+     * @return array{boards: array<int, array{id: int, name: string, slug: string}>, guides: array<string, string|null>}
+     */
+    public function meta(): array
+    {
+        $boards = $this->boards->getActiveBoards('id', 'asc')->map(fn ($b) => [
+            'id' => (int) $b->id,
+            'name' => (string) $b->getLocalizedName(),
+            'slug' => (string) $b->slug,
+        ])->values()->all();
+
+        $root = dirname(__DIR__, 2);
+        $guides = [];
+        foreach (self::GUIDE_NAMES as $tab => $name) {
+            $guides[$tab] = null;
+            foreach (self::GUIDE_EXTENSIONS as $ext) {
+                $rel = self::GUIDE_DIR.'/'.$name.'.'.$ext;
+                if (is_file($root.'/'.$rel)) {
+                    $guides[$tab] = '/api/plugins/assets/'.BoardFilterSettings::IDENTIFIER.'/'.$rel.'?v='.filemtime($root.'/'.$rel);
+                    break;
+                }
+            }
+        }
+
+        return ['boards' => $boards, 'guides' => $guides];
     }
 
     /**
@@ -46,16 +87,19 @@ final class HomeSettingsAdmin
      */
     public function prepareForSave(array $settings): array
     {
-        if (array_key_exists(BoardFilterSettings::KEY, $settings)) {
-            $settings[BoardFilterSettings::KEY] = BoardFilterSettings::normalize($settings[BoardFilterSettings::KEY]);
-        }
         if (! is_array($settings[HomeLayoutForm::INPUT_KEY] ?? null)) {
+            // 0.3.0 게시판 제외 저장 경로 — 예전과 같은 정리만.
+            if (array_key_exists(BoardFilterSettings::KEY, $settings)) {
+                $settings[BoardFilterSettings::KEY] = BoardFilterSettings::normalize($settings[BoardFilterSettings::KEY]);
+            }
             unset($settings[HomeLayoutForm::INPUT_KEY]);
 
             return $settings;
         }
 
-        $layout = $this->settings->normalize(HomeLayoutForm::toStructure($settings[HomeLayoutForm::INPUT_KEY]), null);
+        $settings = HomeLayoutForm::keepLegacyKey($settings);
+        $normalizer = $this->settings->withLegacyExcluded(BoardFilterSettings::excludedIds());
+        $layout = $normalizer->normalize(HomeLayoutForm::toStructure($settings[HomeLayoutForm::INPUT_KEY]), null);
         $active = array_fill_keys($this->activeIds(), true);
         foreach ($layout['sections'] as $i => $section) {
             foreach ($section['cols'] as $c => $col) {
@@ -78,7 +122,7 @@ final class HomeSettingsAdmin
      */
     private function activeIds(): array
     {
-        return $this->boards->getActiveBoards()->pluck('id')->map(fn ($id) => (int) $id)->all();
+        return $this->boards->getActiveBoards('id', 'asc')->pluck('id')->map(fn ($id) => (int) $id)->all();
     }
 
     private function activeIdBySlug(string $slug): ?int

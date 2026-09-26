@@ -59,4 +59,9 @@ Route::prefix('admin')->name('admin.')->middleware('auth:sanctum')->group(functi
     Route::get('home-form', [HomeFormAdminController::class, 'show'])
         ->middleware('permission:admin,core.plugins.read')
         ->name('home-form.show');
+
+    // 홈 화면 설정 화면의 메타(활성 게시판·안내 이미지 주소). 관리자 화면 보완.
+    Route::get('home-meta', [HomeFormAdminController::class, 'meta'])
+        ->middleware('permission:admin,core.plugins.read')
+        ->name('home-meta.show');
 });

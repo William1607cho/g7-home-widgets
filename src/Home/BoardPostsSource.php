@@ -2,6 +2,7 @@
 
 namespace Plugins\G7\Home\Widgets\Home;
 
+use Modules\Sirsoft\Board\Models\Post;
 use Modules\Sirsoft\Board\Services\BoardService;
 
 /**
@@ -73,5 +74,27 @@ final class BoardPostsSource
         $pool = max(self::POPULAR_MIN_POOL, $limit * self::POPULAR_POOL_FACTOR);
 
         return $this->boards->getCachedPopularPosts($period, $pool);
+    }
+
+    /**
+     * 게시글 id 묶음의 분류(category)를 한 번에 읽는다 — 코어 인기글 결과에 분류가 없어서다.
+     * 권한 판정 없는 데이터 조회 1회(id 는 코어가 이미 걸러 준 목록). 세대 키 캐시에 담는다.
+     *
+     * @param  array<int, int>  $ids
+     * @return array<int, string|null> id => 분류
+     */
+    public function categoriesOf(array $ids): array
+    {
+        $ids = array_values(array_unique(array_map('intval', $ids)));
+        if ($ids === []) {
+            return [];
+        }
+        sort($ids);
+
+        return $this->cache->remember('cat:'.sha1(implode(',', $ids)), fn () => Post::query()
+            ->whereIn('id', $ids)
+            ->pluck('category', 'id')
+            ->map(fn ($c) => is_string($c) && $c !== '' ? $c : null)
+            ->all());
     }
 }

@@ -52,9 +52,9 @@ final class HtmlWidget implements HomeWidget
         return ["{$prefix}.html" => ['nullable', 'string', 'max:'.HomeHtml::MAX_LENGTH]];
     }
 
-    public function appliesCommonExclusion(): bool
+    public function boardSelection(): string
     {
-        return true;
+        return 'none';
     }
 
     public function available(): bool

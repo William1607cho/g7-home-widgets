@@ -89,9 +89,9 @@ final class FakeHomeWidget implements HomeWidget
         return [];
     }
 
-    public function appliesCommonExclusion(): bool
+    public function boardSelection(): string
     {
-        return true;
+        return 'many';
     }
 
     public function available(): bool

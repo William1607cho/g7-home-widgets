@@ -1,16 +1,9 @@
 {
-    "_comment": "홈 섹션 설정 화면 원본(틀). scripts/build-home.sh 가 \"__SECTION_ROWS__\"(section-row.json ×5), \"__EXCLUSION__\"(board_filter.v030.json 의 공통 제외 영역 노드), \"__SECTION_PANELS__\"(section-panel.json ×5, 칸 col-panel.json ×2)를 채워 resources/layouts/admin/plugin_settings.json 을 만든다.",
+    "_comment": "홈 화면 설정 화면 원본(틀). scripts/build-home.sh 가 \"__TABS__\"(tab.json ×6), \"__GUIDE__\"(guide.json), \"__SECTION_ROWS__\"(section-row.json ×5), \"__SECTION_PANELS__\"(section-panel.json ×5, 칸 col-card.json ×2)를 채워 resources/layouts/admin/plugin_settings.json 을 만든다. 모든 탭 = 왼쪽 안내(3) : 오른쪽 내용(7), 좁은 화면은 세로로 쌓인다.",
     "version": "1.0.0",
     "layout_name": "plugin_settings",
     "permissions": ["core.plugins.read"],
     "extends": "_admin_base",
-    "scripts": [
-        {
-            "src": "/api/plugins/g7-home-widgets/board-filter-drag.js?v=0.3.0",
-            "id": "g7_home_widgets_board_filter_drag",
-            "async": true
-        }
-    ],
     "meta": {
         "title": "$t:g7-home-widgets.home.title",
         "description": "$t:g7-home-widgets.home.description"
@@ -28,25 +21,14 @@
             "refetchOnMount": true
         },
         {
-            "id": "boardFilter",
-            "label_key": "$t:g7-home-widgets.editor.data_source.board_filter",
+            "id": "homeMeta",
+            "label_key": "$t:g7-home-widgets.home.title",
             "type": "api",
-            "endpoint": "/api/plugins/g7-home-widgets/admin/board-filter",
+            "endpoint": "/api/plugins/g7-home-widgets/admin/home-meta",
             "method": "GET",
             "auto_fetch": true,
             "auth_required": true,
-            "refetchOnMount": true,
-            "onSuccess": [
-                {
-                    "handler": "setState",
-                    "params": {
-                        "target": "local",
-                        "excluded": "{{response.data.data.excluded_board_ids ?? []}}",
-                        "included": "{{(response.data.data.boards ?? []).map(b => b.id).filter(id => !(response.data.data.excluded_board_ids ?? []).includes(id))}}",
-                        "dirty": false
-                    }
-                }
-            ]
+            "refetchOnMount": true
         }
     ],
     "slots": {
@@ -119,44 +101,30 @@
                         "name": "Div",
                         "if": "{{(_local.ui?.tab ?? 'layout') === 'layout'}}",
                         "props": {
-                            "className": "mt-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 space-y-6"
+                            "className": "mt-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6",
+                            "style": {
+                                "display": "flex",
+                                "flexWrap": "wrap",
+                                "gap": "1.5rem",
+                                "alignItems": "flex-start"
+                            },
+                            "data-testid": "g7hw-admin-panel-layout"
                         },
                         "children": [
+                            "__GUIDE_LAYOUT__",
                             {
                                 "id": "section_rows",
                                 "type": "basic",
                                 "name": "Div",
                                 "props": {
-                                    "className": "space-y-3"
+                                    "className": "space-y-3",
+                                    "style": {
+                                        "flex": "7 1 0%",
+                                        "minWidth": "22rem"
+                                    },
+                                    "data-testid": "g7hw-admin-right-layout"
                                 },
                                 "children": "__SECTION_ROWS__"
-                            },
-                            {
-                                "id": "exclusion_area",
-                                "type": "basic",
-                                "name": "Div",
-                                "props": {
-                                    "className": "pt-6 border-t border-gray-200 dark:border-gray-700 space-y-4"
-                                },
-                                "children": [
-                                    {
-                                        "type": "basic",
-                                        "name": "H3",
-                                        "props": {
-                                            "className": "text-base font-semibold text-gray-900 dark:text-white"
-                                        },
-                                        "text": "$t:g7-home-widgets.home.layout.excluded_title"
-                                    },
-                                    {
-                                        "type": "basic",
-                                        "name": "P",
-                                        "props": {
-                                            "className": "text-sm text-gray-500 dark:text-gray-400"
-                                        },
-                                        "text": "$t:g7-home-widgets.home.layout.excluded_help"
-                                    },
-                                    "__EXCLUSION__"
-                                ]
                             }
                         ]
                     },
@@ -197,7 +165,7 @@
                                 "type": "basic",
                                 "name": "Button",
                                 "props": {
-                                    "disabled": "{{_local.isSaving || !homeForm?.data || !boardFilter?.data}}",
+                                    "disabled": "{{_local.isSaving || !homeForm?.data || !homeMeta?.data}}",
                                     "className": "btn btn-primary flex-center gap-1.5"
                                 },
                                 "actions": [
@@ -220,8 +188,7 @@
                                                 "params": {
                                                     "method": "PUT",
                                                     "body": {
-                                                        "home_layout_form": "{{_local.form}}",
-                                                        "excluded_board_ids": "{{_local.excluded ?? []}}"
+                                                        "home_layout_form": "{{_local.form}}"
                                                     }
                                                 },
                                                 "onSuccess": [
@@ -245,12 +212,6 @@
                                                         "handler": "refetchDataSource",
                                                         "params": {
                                                             "dataSourceId": "homeForm"
-                                                        }
-                                                    },
-                                                    {
-                                                        "handler": "refetchDataSource",
-                                                        "params": {
-                                                            "dataSourceId": "boardFilter"
                                                         }
                                                     }
                                                 ],

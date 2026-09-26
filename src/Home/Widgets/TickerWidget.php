@@ -43,15 +43,16 @@ final class TickerWidget implements HomeWidget
 
     public function limitRange(): array
     {
-        return [1, 10];
+        return [1, 20];
     }
 
     /**
      * 티커는 게시판 1개만 고른다: 방식은 항상 `only`, id 는 첫 번째 하나만 남긴다.
+     * 다른 종류의 선택(포함 안 함 목록 등)이 남아 있으면 쓰지 않는다(빈 선택).
      */
     public function normalize(array $col, array $raw): array
     {
-        $ids = $col['boards']['ids'] ?? [];
+        $ids = ($col['boards']['mode'] ?? '') === 'only' ? ($col['boards']['ids'] ?? []) : [];
         $col['boards'] = ['mode' => 'only', 'ids' => $ids === [] ? [] : [(int) $ids[0]]];
 
         return $col;
@@ -60,18 +61,18 @@ final class TickerWidget implements HomeWidget
     public function rules(string $prefix): array
     {
         return [
-            "{$prefix}.limit" => ['integer', 'min:1', 'max:10'],
+            "{$prefix}.limit" => ['integer', 'min:1', 'max:20'],
             "{$prefix}.boards.ids" => ['array', 'max:1'],
         ];
     }
 
     /**
-     * 공통 제외 목록을 적용하지 않는다(확정 사항) — blog 처럼 공지 게시판이 공통 제외에 있어도
-     * 티커는 비지 않는다. 열람 가능 판정은 {@see \Plugins\G7\Home\Widgets\Home\BoardScope} 가 그대로 적용한다.
+     * 게시판 1개(공통 제외와 무관 — 확정 사항). 열람 가능 판정은
+     * {@see \Plugins\G7\Home\Widgets\Home\BoardScope} 가 그대로 적용한다.
      */
-    public function appliesCommonExclusion(): bool
+    public function boardSelection(): string
     {
-        return false;
+        return 'one';
     }
 
     public function available(): bool

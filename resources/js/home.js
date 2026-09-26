@@ -167,9 +167,69 @@
         scan();
     }
 
+    /*
+     * 관리자 설정 화면 칩 끌기(관리자 화면 보완 묶음). 칸마다 영역이 따로라 영역 값에 칸 키를 붙인다
+     * (`data-hw-zone="s1c1:included|excluded"`, 카드 `data-hw-card`, 옮기기 버튼 `data-hw-move`).
+     * 레이아웃 JSON 액션은 dragstart 를 막으므로(0.3.0 과 같은 사정) 끌기를 여기서 시작하고, 다른 영역에
+     * 놓으면 그 카드의 X·+ 버튼을 대신 누른다 — 클릭과 같은 상태 변경 경로. 요청·저장소 접근 없음.
+     */
+    function initAdminDrag() {
+        if (window.__g7HomeWidgetsAdminDrag) {
+            return;
+        }
+        window.__g7HomeWidgetsAdminDrag = true;
+        var dragging = null;
+        var zoneOf = function (el) {
+            return el && el.closest ? el.closest('[data-hw-zone]') : null;
+        };
+        document.addEventListener('dragstart', function (event) {
+            var card = event.target && event.target.closest ? event.target.closest('[data-hw-card]') : null;
+            var zone = zoneOf(card);
+            var id = card ? card.getAttribute('data-hw-card') : '';
+            var from = zone ? zone.getAttribute('data-hw-zone') : '';
+            if (!/^[0-9]+$/.test(id) || !/^s[1-5]c[12]:(included|excluded)$/.test(from)) {
+                return;
+            }
+            dragging = { id: id, from: from };
+            if (event.dataTransfer) {
+                event.dataTransfer.setData('text/plain', id);
+                event.dataTransfer.effectAllowed = 'move';
+            }
+        });
+        document.addEventListener('dragover', function (event) {
+            var zone = zoneOf(event.target);
+            if (dragging && zone && zone.getAttribute('data-hw-zone').split(':')[0] === dragging.from.split(':')[0]) {
+                event.preventDefault();
+            }
+        });
+        document.addEventListener('drop', function (event) {
+            var zone = zoneOf(event.target);
+            var info = dragging;
+            dragging = null;
+            if (!info || !zone) {
+                return;
+            }
+            var to = zone.getAttribute('data-hw-zone');
+            if (to === info.from || to.split(':')[0] !== info.from.split(':')[0]) {
+                return;
+            }
+            event.preventDefault();
+            var source = document.querySelector('[data-hw-zone="' + info.from + '"]');
+            var card = source ? source.querySelector('[data-hw-card="' + info.id + '"]') : null;
+            var button = card ? card.querySelector('[data-hw-move]') : null;
+            if (button) {
+                button.click();
+            }
+        });
+        document.addEventListener('dragend', function () {
+            dragging = null;
+        });
+    }
+
     function init() {
         registerHandlers();
         watch();
+        initAdminDrag();
     }
 
     if (document.readyState === 'loading') {

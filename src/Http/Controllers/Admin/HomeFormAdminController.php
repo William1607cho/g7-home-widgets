@@ -23,4 +23,12 @@ class HomeFormAdminController extends AdminBaseController
     {
         return $this->success('common.success', $this->admin->form());
     }
+
+    /**
+     * 화면용 메타(활성 게시판 목록, 탭별 안내 이미지 주소) — `GET admin/home-meta`.
+     */
+    public function meta(): JsonResponse
+    {
+        return $this->success('common.success', $this->admin->meta());
+    }
 }

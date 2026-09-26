@@ -58,7 +58,10 @@ jq --indent 4 --slurpfile frags "$work/frags.json" '
 
 # 관리자 설정 화면(0.4.0 2묶음): resources/home/admin/* → resources/layouts/admin/plugin_settings.json
 admin="$root/resources/home/admin"
-FILL='def fill($k; $v): walk(if type == "array" then map(if . == $k then (if ($v|type) == "array" then $v[] else $v end) else . end) elif . == $k then $v else . end);'
+# 자리표시 채우기. 배열 원소 자리표시는 펼쳐 넣고(값이 배열이면 원소들로), 객체 속성 값 자리표시는 통째로 바꾼다.
+# 문자열 잎 단계에서는 바꾸지 않는다 — walk 는 잎부터 방문하므로 잎에서 바꾸면 배열 원소 자리표시가
+# "배열 하나"로 끼워진다(관리자 화면 보완 묶음에서 찾은 결함: 섹션 탭·공통 제외 영역이 비었다).
+FILL='def fill($k; $v): walk(if type == "array" then map(if . == $k then (if ($v|type) == "array" then $v[] else $v end) else . end) elif type == "object" then with_entries(if .value == $k then .value = $v else . end) else . end);'
 stamp() { # 파일 [찾을 문자열 바꿀 문자열]... → 모든 문자열 값에서 바꾼다
   local f=$1; shift
   local prog='.' i=0 args=()
@@ -73,20 +76,21 @@ jq -c '[.[] | {value: ., label: ("$t:g7-home-widgets.home.types." + .)}]' "$regi
 jq -c '[{value: "", label: "$t:g7-home-widgets.home.col.default_icon"}] + [.icons[] | {value: ., label: .}]' "$root/resources/home/icons.json" > "$work/icon_opts.json"
 for t in layout s1 s2 s3 s4 s5; do stamp "$admin/tab.json" __TAB__ "$t"; done | jq -s '.' > "$work/tabs.json"
 for s in 1 2 3 4 5; do stamp "$admin/section-row.json" __S__ "$s"; done | jq -s '.' > "$work/rows.json"
+stamp "$admin/guide.json" __GUIDE__ layout | jq 'del(._comment)' > "$work/guide_layout.json"
 : > "$work/panels.ndjson"
 for s in 1 2 3 4 5; do
   for c in 1 2; do
-    stamp "$admin/col-panel.json" __K__ "s${s}c${c}" __S__ "$s" __C__ "$c" \
-      | jq --slurpfile o "$work/type_opts.json" --slurpfile i "$work/icon_opts.json" "$FILL fill(\"__TYPE_OPTIONS__\"; \$o[0]) | fill(\"__ICON_OPTIONS__\"; \$i[0])"
+    stamp "$admin/col-card.json" __K__ "s${s}c${c}" __S__ "$s" __C__ "$c" \
+      | jq --slurpfile o "$work/type_opts.json" --slurpfile i "$work/icon_opts.json" "$FILL del(._comment) | fill(\"__TYPE_OPTIONS__\"; \$o[0]) | fill(\"__ICON_OPTIONS__\"; \$i[0])"
   done | jq -s '.' > "$work/cols.json"
-  stamp "$admin/section-panel.json" __S__ "$s" | jq --slurpfile c "$work/cols.json" "$FILL fill(\"__COLS__\"; \$c[0])" >> "$work/panels.ndjson"
+  stamp "$admin/guide.json" __GUIDE__ "s$s" | jq 'del(._comment)' > "$work/guide.json"
+  stamp "$admin/section-panel.json" __S__ "$s" \
+    | jq --slurpfile c "$work/cols.json" --slurpfile g "$work/guide.json" "$FILL fill(\"__COLS__\"; \$c[0]) | fill(\"__GUIDE__\"; \$g[0])" >> "$work/panels.ndjson"
 done
 jq -s '.' "$work/panels.ndjson" > "$work/panels.json"
-jq '[.. | objects | select(.id == "board_filter_panel") | .children[0].children[]]' "$admin/board_filter.v030.json" > "$work/exclusion.json"
-[ "$(jq 'length' "$work/exclusion.json")" -eq 4 ] || { echo "공통 제외 영역 노드 추출 실패" >&2; exit 2; }
 # 관리자 화면 생성물은 한 줄(compact)로 쓴다 — 칸 10개 × 아이콘 선택지 141개라 들여쓰기하면 파일이 커진다.
-jq -c --slurpfile tabs "$work/tabs.json" --slurpfile rows "$work/rows.json" --slurpfile ex "$work/exclusion.json" --slurpfile panels "$work/panels.json" \
-  "$FILL del(._comment) | fill(\"__TABS__\"; \$tabs[0]) | fill(\"__SECTION_ROWS__\"; \$rows[0]) | fill(\"__EXCLUSION__\"; \$ex[0]) | fill(\"__SECTION_PANELS__\"; \$panels[0])" \
+jq -c --slurpfile tabs "$work/tabs.json" --slurpfile rows "$work/rows.json" --slurpfile gl "$work/guide_layout.json" --slurpfile panels "$work/panels.json" \
+  "$FILL del(._comment) | fill(\"__TABS__\"; \$tabs[0]) | fill(\"__SECTION_ROWS__\"; \$rows[0]) | fill(\"__GUIDE_LAYOUT__\"; \$gl[0]) | fill(\"__SECTION_PANELS__\"; \$panels[0])" \
   "$admin/page.base.json" > "$work/plugin_settings.json"
 
 cp "$root/resources/css/home.css" "$work/plugin.css"
@@ -129,8 +133,16 @@ echo "icons checked: $(echo $lit $php_icons | wc -w) (outside subset: $missing)"
 left=$(grep -c '__[A-Z_]*__' "$work/plugin_settings.json" || true)
 adups=$(jq '[.. | objects | select(has("type") and has("name")) | .id // empty] | group_by(.) | map(select(length > 1)) | length' "$work/plugin_settings.json")
 apanels=$(jq '[.. | objects | select(.props?["data-testid"]? // "" | test("^g7hw-admin-s[1-5]c[12]$"))] | length' "$work/plugin_settings.json")
-echo "admin: placeholders left=$left duplicate ids=$adups col panels=$apanels tabs=$(jq 'length' "$work/tabs.json")"
-[ "$left" -eq 0 ] && [ "$adups" -eq 0 ] && [ "$apanels" -eq 10 ] || fail "관리자 화면 생성 검사"
+aguides=$(jq '[.. | objects | select(.props?["data-testid"]? // "" | test("^g7hw-admin-guide-(layout|s[1-5])$"))] | length' "$work/plugin_settings.json")
+echo "admin: placeholders left=$left duplicate ids=$adups col cards=$apanels guides=$aguides tabs=$(jq 'length' "$work/tabs.json")"
+[ "$left" -eq 0 ] && [ "$adups" -eq 0 ] && [ "$apanels" -eq 10 ] && [ "$aguides" -eq 6 ] || fail "관리자 화면 생성 검사"
+
+# 모든 children 은 객체만 담은 배열이어야 한다(배열 안 배열·문자열 0) — 자리표시가 잘못 끼면 렌더러가 그리지 않는다.
+BADCH='[.. | objects | select(has("children")) | .children | if type == "array" then .[] | select(type != "object") else "not-array" end] | length'
+bad_admin=$(jq "$BADCH" "$work/plugin_settings.json")
+bad_overlay=$(jq "[.injections[].components[] | $BADCH] | add" "$work/home.json")
+echo "non-object children: admin=$bad_admin overlay=$bad_overlay"
+[ "$bad_admin" -eq 0 ] && [ "$bad_overlay" -eq 0 ] || fail "children 형식"
 
 # ---------- 생성물 대조·쓰기 ----------
 sync_one() { # 임시본 대상

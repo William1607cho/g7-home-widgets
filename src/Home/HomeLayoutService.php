@@ -33,8 +33,11 @@ final class HomeLayoutService
      */
     public function build(): array
     {
-        $scope = new BoardScope($this->source->readableBoards(), BoardFilterSettings::excludedIds());
-        $layout = $this->settings->normalize($this->storedLayout(), $scope->idBySlug(self::DEFAULT_TICKER_SLUG));
+        // 공통 제외는 새 섹션에 적용하지 않는다. 옛 excluded_board_ids 는 자기 선택이 없는 목록 위젯의
+        // "포함 안 함" 기본값으로만 쓴다(이관, 설정 파일은 고쳐 쓰지 않음).
+        $scope = new BoardScope($this->source->readableBoards());
+        $settings = $this->settings->withLegacyExcluded(BoardFilterSettings::excludedIds());
+        $layout = $settings->normalize($this->storedLayout(), $scope->idBySlug(self::DEFAULT_TICKER_SLUG));
 
         $sections = [];
         $fallbacks = [];
@@ -52,7 +55,7 @@ final class HomeLayoutService
                 }
                 if ($widget->id() !== $col['type']) {
                     $fallbacks[] = ['key' => $cKey, 'from' => $col['type'], 'to' => $widget->id()];
-                    $col = ['boards' => $col['boards']] + $this->settings->defaultCol($widget->id());
+                    $col = ['boards' => $col['boards']] + $settings->defaultCol($widget->id());
                 }
                 $cols[] = $this->buildCol($cKey, $widget, $col, $scope);
             }
@@ -78,7 +81,7 @@ final class HomeLayoutService
             'title' => $title,
             'icon' => $col['icon'] !== '' ? $col['icon'] : $widget->defaultIcon(),
             'empty_text' => __('g7-home-widgets::messages.home.empty.'.$widget->id()),
-        ] + $widget->data($col, $scope->resolve($col['boards'], $widget->appliesCommonExclusion()));
+        ] + $widget->data($col, $widget->boardSelection() === 'none' ? [] : $scope->resolve($col['boards']));
     }
 
     /**

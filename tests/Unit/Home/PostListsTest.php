@@ -64,6 +64,21 @@ class PostListsTest extends TestCase
         $this->assertSame(['Alpha', 'Kept', ''], array_column($out, 'board_name'));
     }
 
+    public function test_category_is_added_and_dropped_for_wiki_boards(): void
+    {
+        $items = [
+            ['id' => 1, 'board_slug' => 'free'],
+            ['id' => 2, 'board_slug' => 'wiki'],
+            ['id' => 3, 'board_slug' => 'free'],
+        ];
+        $out = PostLists::withCategory($items, [1 => '잡담', 2 => '문서', 3 => ''], ['wiki']);
+
+        $this->assertSame(['잡담', null, null], array_column($out, 'category'));
+        // 코어 결과에 분류가 이미 있으면(최근글) 그대로 쓴다
+        $recent = PostLists::withCategory([['id' => 9, 'board_slug' => 'free', 'category' => '공지']], null, []);
+        $this->assertSame('공지', $recent[0]['category']);
+    }
+
     public function test_pick_keeps_only_listed_keys(): void
     {
         $out = PostLists::pick([['id' => 1, 'author' => ['email' => 'x'], 'title' => 't']], ['id', 'title', 'missing']);

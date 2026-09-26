@@ -84,6 +84,26 @@ final class PostLists
     }
 
     /**
+     * 분류를 붙이고(있으면) 위키 게시판 글은 분류를 뺀다 — 화면은 "게시판 이름 · 분류", 위키는 이름만.
+     *
+     * @param  array<int, array<string, mixed>>  $items
+     * @param  array<int, string|null>|null  $categories  id => 분류 (null 이면 항목의 category 를 그대로 쓴다)
+     * @param  array<int, string>  $wikiSlugs  위키 게시판 slug
+     * @return array<int, array<string, mixed>>
+     */
+    public static function withCategory(array $items, ?array $categories, array $wikiSlugs): array
+    {
+        $wiki = array_fill_keys($wikiSlugs, true);
+        foreach ($items as $i => $item) {
+            $category = $categories === null ? ($item['category'] ?? null) : ($categories[(int) ($item['id'] ?? 0)] ?? null);
+            $category = is_string($category) && $category !== '' ? $category : null;
+            $items[$i]['category'] = isset($wiki[$item['board_slug'] ?? '']) ? null : $category;
+        }
+
+        return $items;
+    }
+
+    /**
      * 항목에서 지정한 키만 남긴다(응답 크기·노출 칸 고정).
      *
      * @param  array<int, array<string, mixed>>  $items

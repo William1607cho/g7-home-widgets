@@ -5,6 +5,7 @@ namespace Plugins\G7\Home\Widgets\Home\Widgets;
 use Plugins\G7\Home\Widgets\Home\BoardPostsSource;
 use Plugins\G7\Home\Widgets\Home\HomeWidget;
 use Plugins\G7\Home\Widgets\Home\PostLists;
+use Plugins\G7\Home\Widgets\Home\WikiBoards;
 
 /**
  * 최근글 위젯 — 고른 게시판들의 글을 작성일 순으로 합친다(0.4.0).
@@ -27,7 +28,7 @@ final class RecentWidget implements HomeWidget
 
     public function defaults(): array
     {
-        return ['limit' => 10, 'boards' => ['mode' => 'all', 'ids' => []]];
+        return ['limit' => 10, 'boards' => ['mode' => 'exclude', 'ids' => []]];
     }
 
     public function titleKey(): string
@@ -55,9 +56,9 @@ final class RecentWidget implements HomeWidget
         return ["{$prefix}.limit" => ['integer', 'min:1', 'max:20']];
     }
 
-    public function appliesCommonExclusion(): bool
+    public function boardSelection(): string
     {
-        return true;
+        return 'many';
     }
 
     public function available(): bool
@@ -77,6 +78,9 @@ final class RecentWidget implements HomeWidget
             $perBoard[] = ['board' => $board, 'items' => $this->source->recentOfBoard($board['id'])];
         }
 
-        return ['items' => PostLists::pick(PostLists::mergeRecent($perBoard, (int) $col['limit'], false), self::ITEM_KEYS)];
+        $items = PostLists::mergeRecent($perBoard, (int) $col['limit'], false);
+        $items = PostLists::withCategory($items, null, WikiBoards::slugsIn($boards));
+
+        return ['items' => PostLists::pick($items, self::ITEM_KEYS)];
     }
 }

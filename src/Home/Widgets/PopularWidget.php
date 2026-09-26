@@ -5,6 +5,7 @@ namespace Plugins\G7\Home\Widgets\Home\Widgets;
 use Plugins\G7\Home\Widgets\Home\BoardPostsSource;
 use Plugins\G7\Home\Widgets\Home\HomeWidget;
 use Plugins\G7\Home\Widgets\Home\PostLists;
+use Plugins\G7\Home\Widgets\Home\WikiBoards;
 
 /**
  * 인기글 위젯 — 기간 탭(이번주·이번달·1년)을 한 응답에 함께 싣는다(0.4.0).
@@ -21,7 +22,7 @@ final class PopularWidget implements HomeWidget
     public const PERIODS = ['week', 'month', 'year'];
 
     /** 응답에 싣는 항목 키 */
-    public const ITEM_KEYS = ['id', 'board_slug', 'board_name', 'title', 'created_at',
+    public const ITEM_KEYS = ['id', 'board_slug', 'board_name', 'title', 'category', 'created_at',
         'created_at_formatted', 'view_count', 'comment_count'];
 
     public function __construct(private readonly BoardPostsSource $source) {}
@@ -33,7 +34,7 @@ final class PopularWidget implements HomeWidget
 
     public function defaults(): array
     {
-        return ['limit' => 10, 'boards' => ['mode' => 'all', 'ids' => []], 'period' => 'week'];
+        return ['limit' => 10, 'boards' => ['mode' => 'exclude', 'ids' => []], 'period' => 'week'];
     }
 
     public function titleKey(): string
@@ -67,9 +68,9 @@ final class PopularWidget implements HomeWidget
         ];
     }
 
-    public function appliesCommonExclusion(): bool
+    public function boardSelection(): string
     {
-        return true;
+        return 'many';
     }
 
     public function available(): bool
@@ -86,11 +87,19 @@ final class PopularWidget implements HomeWidget
     {
         $slugs = array_column($boards, 'slug');
         $names = array_column($boards, 'name', 'slug');
+        $wikiSlugs = WikiBoards::slugsIn($boards);
         $limit = (int) $col['limit'];
+        $lists = [];
+        foreach (self::PERIODS as $period) {
+            $lists[$period] = $slugs === [] ? [] : PostLists::keepBoards($this->source->popular($period, $limit), $slugs, $limit);
+        }
+        // 코어 인기글 결과에는 분류가 없다 — 세 기간 글 id 를 모아 분류만 한 번에 읽는다.
+        $categories = $this->source->categoriesOf(array_column(array_merge(...array_values($lists)), 'id'));
+
         $periods = [];
         foreach (self::PERIODS as $period) {
-            $items = $slugs === [] ? [] : PostLists::keepBoards($this->source->popular($period, $limit), $slugs, $limit);
-            $items = PostLists::fillBoardNames($items, $names);
+            $items = PostLists::fillBoardNames($lists[$period], $names);
+            $items = PostLists::withCategory($items, $categories, $wikiSlugs);
             $periods[] = [
                 'key' => $period,
                 'label' => __('g7-home-widgets::messages.home.periods.'.$period),

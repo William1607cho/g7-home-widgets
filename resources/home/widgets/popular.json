@@ -145,6 +145,24 @@
                                         {
                                             "type": "basic",
                                             "name": "Span",
+                                            "if": "{{item.category}}",
+                                            "props": {
+                                                "className": "g7hw-sep"
+                                            },
+                                            "text": "·"
+                                        },
+                                        {
+                                            "type": "basic",
+                                            "name": "Span",
+                                            "if": "{{item.category}}",
+                                            "props": {
+                                                "className": "g7hw-category"
+                                            },
+                                            "text": "{{item.category}}"
+                                        },
+                                        {
+                                            "type": "basic",
+                                            "name": "Span",
                                             "props": {
                                                 "className": "g7hw-views"
                                             },

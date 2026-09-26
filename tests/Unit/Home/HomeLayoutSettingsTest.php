@@ -43,7 +43,7 @@ class HomeLayoutSettingsTest extends TestCase
         $this->assertSame(['mode' => 'only', 'ids' => [7]], $d['sections'][1]['cols'][0]['boards']);
         $this->assertSame(5, $d['sections'][1]['cols'][0]['limit']);
         $this->assertSame('week', $d['sections'][0]['cols'][1]['period']);
-        $this->assertSame(['mode' => 'all', 'ids' => []], $d['sections'][0]['cols'][0]['boards']);
+        $this->assertSame(['mode' => 'exclude', 'ids' => []], $d['sections'][0]['cols'][0]['boards']);
         $this->assertSame('', $d['sections'][0]['cols'][0]['title']);
         $this->assertSame('', $d['sections'][0]['cols'][0]['icon']);
     }
@@ -110,7 +110,7 @@ class HomeLayoutSettingsTest extends TestCase
         $this->assertSame('a b', $a['title']);
         $this->assertSame('', $a['icon']);
         $this->assertSame(20, $a['limit']);
-        $this->assertSame(['mode' => 'all', 'ids' => [2, 3]], $a['boards']);
+        $this->assertSame(['mode' => 'exclude', 'ids' => [2, 3]], $a['boards']);
 
         $this->assertSame(60, mb_strlen($b['title']));
         $this->assertSame('fire', $b['icon']);
@@ -135,10 +135,35 @@ class HomeLayoutSettingsTest extends TestCase
     {
         $out = $this->settings()->normalize(['sections' => [[
             'enabled' => true, 'columns' => 1,
-            'cols' => [['type' => 'ticker', 'boards' => ['mode' => 'all', 'ids' => [9, 3, 5]]]],
+            'cols' => [['type' => 'ticker', 'boards' => ['mode' => 'only', 'ids' => [9, 3, 5]]]],
         ]]], null);
 
         $this->assertSame(['mode' => 'only', 'ids' => [3]], $out['sections'][0]['cols'][0]['boards']);
+    }
+
+    public function test_ticker_ignores_a_leftover_exclude_list(): void
+    {
+        $out = $this->settings()->normalize(['sections' => [[
+            'enabled' => true, 'columns' => 1,
+            'cols' => [['type' => 'ticker', 'boards' => ['mode' => 'exclude', 'ids' => [9, 3]]]],
+        ]]], null);
+
+        $this->assertSame(['mode' => 'only', 'ids' => []], $out['sections'][0]['cols'][0]['boards']);
+    }
+
+    public function test_legacy_excluded_ids_are_the_default_for_list_widgets_only(): void
+    {
+        $s = $this->settings()->withLegacyExcluded([47, 33, 46, 34]);
+        $d = $s->defaults(46);
+
+        $this->assertSame(['mode' => 'exclude', 'ids' => [33, 34, 46, 47]], $d['sections'][0]['cols'][0]['boards']);
+        $this->assertSame(['mode' => 'exclude', 'ids' => [33, 34, 46, 47]], $d['sections'][0]['cols'][1]['boards']);
+        // 티커는 공통 제외와 무관 — 공지(46)가 제외 목록에 있어도 그대로
+        $this->assertSame(['mode' => 'only', 'ids' => [46]], $d['sections'][1]['cols'][0]['boards']);
+        // 자기 선택이 저장된 칸은 그 값을 쓴다
+        $saved = $s->normalize(['sections' => [['enabled' => true, 'columns' => 1,
+            'cols' => [['type' => 'recent', 'boards' => ['mode' => 'exclude', 'ids' => [5]]]]]]], 46);
+        $this->assertSame(['mode' => 'exclude', 'ids' => [5]], $saved['sections'][0]['cols'][0]['boards']);
     }
 
     public function test_icons_outside_the_allow_list_fall_back_to_default(): void

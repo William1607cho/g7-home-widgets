@@ -72,10 +72,38 @@ class HomeLayoutFormTest extends TestCase
 
         $this->assertArrayHasKey('home_layout_form.s5c2_period', $rules);
         $this->assertContains('in:recent,popular,ticker', $rules['home_layout_form.s3c1_type']);
-        $this->assertContains('max:10', $rules['home_layout_form.s1c1_limit']);
+        // 목록 위젯 개수는 종류와 관계없이 1~20
+        $this->assertContains('max:20', $rules['home_layout_form.s1c1_limit']);
+        $this->assertContains('min:1', $rules['home_layout_form.s1c1_limit']);
         $this->assertContains('max:20', $rules['home_layout_form.s1c2_limit']);
         // 폼 1 + 섹션 5×2(enabled·columns) + 칸 10×10(type·limit·mode·ids·ids.*·board·period·title·icon·html)
         $this->assertSame(1 + 5 * 2 + 10 * 10, count($rules));
+    }
+
+    public function test_new_form_save_never_carries_the_legacy_key(): void
+    {
+        $out = HomeLayoutForm::keepLegacyKey(['home_layout_form' => [], 'excluded_board_ids' => [1, 2]]);
+
+        $this->assertArrayNotHasKey('excluded_board_ids', $out);
+        $this->assertArrayHasKey('home_layout_form', $out);
+    }
+
+    public function test_board_choices_become_exclude_lists(): void
+    {
+        $this->assertSame([4], HomeLayoutForm::excludeList(['mode' => 'exclude', 'ids' => [4]], [1, 4, 9]));
+        $this->assertSame([4, 9], HomeLayoutForm::excludeList(['mode' => 'only', 'ids' => [1]], [1, 4, 9]));
+        $this->assertSame([], HomeLayoutForm::excludeList(['mode' => 'all', 'ids' => [1]], [1, 4, 9]));
+    }
+
+    public function test_list_widgets_are_saved_as_exclude_lists_and_ticker_as_one_board(): void
+    {
+        $flat = ['s1_enabled' => true, 's1_columns' => 2,
+            's1c1_type' => 'gallery', 's1c1_limit' => 3, 's1c1_ids' => [7, 8],
+            's1c2_type' => 'ticker', 's1c2_limit' => 20, 's1c2_board' => '5', 's1c2_ids' => [1, 2]];
+        $cols = HomeLayoutForm::toStructure($flat)['sections'][0]['cols'];
+
+        $this->assertSame(['mode' => 'exclude', 'ids' => [7, 8]], $cols[0]['boards']);
+        $this->assertSame(['mode' => 'only', 'ids' => ['5']], $cols[1]['boards']);
     }
 
     public function test_icon_rule_uses_the_allow_list_when_given(): void

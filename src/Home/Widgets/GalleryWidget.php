@@ -27,7 +27,7 @@ final class GalleryWidget implements HomeWidget
 
     public function defaults(): array
     {
-        return ['limit' => 8, 'boards' => ['mode' => 'all', 'ids' => []]];
+        return ['limit' => 8, 'boards' => ['mode' => 'exclude', 'ids' => []]];
     }
 
     public function titleKey(): string
@@ -55,9 +55,9 @@ final class GalleryWidget implements HomeWidget
         return ["{$prefix}.limit" => ['integer', 'min:1', 'max:20']];
     }
 
-    public function appliesCommonExclusion(): bool
+    public function boardSelection(): string
     {
-        return true;
+        return 'many';
     }
 
     public function available(): bool

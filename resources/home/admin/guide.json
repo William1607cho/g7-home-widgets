@@ -1,0 +1,64 @@
+{
+    "_comment": "탭 왼쪽(3) 안내 영역. __GUIDE__ = layout | s1..s5. 이미지 주소는 GET admin/home-meta 의 guides.<키>(파일이 없으면 null → 자리표시 틀).",
+    "type": "basic",
+    "name": "Div",
+    "props": {
+        "className": "space-y-3",
+        "style": {
+            "flex": "3 1 0%",
+            "minWidth": "14rem"
+        },
+        "data-testid": "g7hw-admin-guide-__GUIDE__"
+    },
+    "children": [
+        {
+            "type": "basic",
+            "name": "Img",
+            "if": "{{!!homeMeta?.data?.guides?.__GUIDE__}}",
+            "props": {
+                "src": "{{homeMeta?.data?.guides?.__GUIDE__}}",
+                "alt": "$t:g7-home-widgets.home.guide.alt",
+                "className": "w-full rounded-lg border border-gray-200 dark:border-gray-700",
+                "data-testid": "g7hw-admin-guide-img"
+            }
+        },
+        {
+            "type": "basic",
+            "name": "Div",
+            "if": "{{!homeMeta?.data?.guides?.__GUIDE__}}",
+            "props": {
+                "className": "flex flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600 text-gray-400 dark:text-gray-500",
+                "style": {
+                    "aspectRatio": "4 / 3"
+                },
+                "data-testid": "g7hw-admin-guide-placeholder"
+            },
+            "children": [
+                {
+                    "type": "basic",
+                    "name": "Icon",
+                    "props": {
+                        "name": "image",
+                        "className": "w-8 h-8"
+                    }
+                },
+                {
+                    "type": "basic",
+                    "name": "Span",
+                    "props": {
+                        "className": "text-sm"
+                    },
+                    "text": "$t:g7-home-widgets.home.guide.placeholder"
+                }
+            ]
+        },
+        {
+            "type": "basic",
+            "name": "P",
+            "props": {
+                "className": "text-sm text-gray-600 dark:text-gray-300"
+            },
+            "text": "$t:g7-home-widgets.home.guide.__GUIDE__"
+        }
+    ]
+}

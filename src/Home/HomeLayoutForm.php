@@ -13,11 +13,22 @@ use Closure;
  * 저장 전 필터가 {@see self::toStructure()} → {@see HomeLayoutSettings::normalize()} 로 바꿔 넣는다.
  *
  * 칸마다 두 칸(c1·c2)을 항상 싣는다 — 1단으로 바꿔도 두 번째 칸 값이 남아 있다가 2단으로 돌아오면 쓰인다.
+ *
+ * 게시판 선택(보완 묶음): 목록 위젯(`MANY_TYPES`)의 `_ids` 는 **포함 안 함 목록**이다(새 게시판 자동 포함).
+ * 티커는 `_board` 하나. 옛 저장값(`only`·`all`)은 폼으로 옮길 때 활성 게시판 기준 포함 안 함 목록으로 바꾼다.
  */
 final class HomeLayoutForm
 {
     /** 저장 요청의 평면 폼 키 */
     public const INPUT_KEY = 'home_layout_form';
+
+    /** 게시판 여러 개를 쓰는 목록 위젯(포함 안 함 목록으로 저장) */
+    public const MANY_TYPES = ['recent', 'popular', 'gallery'];
+
+    /** 목록 위젯 개수 범위(확정 사항: 전부 1~20) */
+    public const LIMIT_MIN = 1;
+
+    public const LIMIT_MAX = 20;
 
     /** 칸 평면 필드(접미사) */
     public const COL_FIELDS = ['type', 'title', 'icon', 'limit', 'mode', 'ids', 'board', 'period', 'html'];
@@ -27,9 +38,10 @@ final class HomeLayoutForm
      *
      * @param  array<string, mixed>  $layout  {@see HomeLayoutSettings::normalize()} 결과
      * @param  array<string, mixed>  $defaultCol  두 번째 칸이 없을 때 채울 기본 칸
+     * @param  array<int, int>  $activeIds  활성 게시판 id(옛 `only` 저장값을 포함 안 함 목록으로 바꿀 때)
      * @return array<string, mixed>
      */
-    public static function toFlat(array $layout, array $defaultCol): array
+    public static function toFlat(array $layout, array $defaultCol, array $activeIds = []): array
     {
         $flat = [];
         foreach ($layout['sections'] as $i => $section) {
@@ -46,6 +58,10 @@ final class HomeLayoutForm
                 $flat[$k.'_limit'] = (int) $col['limit'];
                 $flat[$k.'_mode'] = $col['boards']['mode'] ?? 'all';
                 $flat[$k.'_ids'] = $ids;
+                if (in_array($col['type'], self::MANY_TYPES, true)) {
+                    $flat[$k.'_mode'] = 'exclude';
+                    $flat[$k.'_ids'] = self::excludeList($col['boards'] ?? [], $activeIds);
+                }
                 $flat[$k.'_board'] = $col['type'] === 'ticker' && $ids !== [] ? (int) $ids[0] : null;
                 $flat[$k.'_period'] = $col['period'] ?? 'week';
                 $flat[$k.'_html'] = (string) ($col['html'] ?? '');
@@ -53,6 +69,38 @@ final class HomeLayoutForm
         }
 
         return $flat;
+    }
+
+    /**
+     * 새 화면 저장에서는 옛 공통 제외 키(`excluded_board_ids`)를 요청에서 뺀다 — 코어 저장이 기존 파일 값과
+     * 병합하므로 이 키는 파일에 있던 값 그대로 남는다(옛 위젯 API 3종이 계속 쓴다).
+     *
+     * @param  array<string, mixed>  $settings
+     * @return array<string, mixed>
+     */
+    public static function keepLegacyKey(array $settings): array
+    {
+        unset($settings['excluded_board_ids']);
+
+        return $settings;
+    }
+
+    /**
+     * 게시판 선택 → 포함 안 함 목록. `exclude` 는 그대로, `only` 는 활성 게시판 − 고른 목록, `all` 은 빈 목록.
+     *
+     * @param  array<string, mixed>  $boards
+     * @param  array<int, int>  $activeIds
+     * @return array<int, int>
+     */
+    public static function excludeList(array $boards, array $activeIds): array
+    {
+        $ids = array_values(array_map('intval', $boards['ids'] ?? []));
+
+        return match ($boards['mode'] ?? 'all') {
+            'exclude' => $ids,
+            'only' => array_values(array_diff(array_map('intval', $activeIds), $ids)),
+            default => [],
+        };
     }
 
     /**
@@ -77,9 +125,11 @@ final class HomeLayoutForm
                     'title' => $flat[$k.'_title'] ?? '',
                     'icon' => $flat[$k.'_icon'] ?? '',
                     'limit' => $flat[$k.'_limit'] ?? null,
-                    'boards' => $type === 'ticker'
-                        ? ['mode' => 'only', 'ids' => $board === null || $board === '' ? [] : [$board]]
-                        : ['mode' => $flat[$k.'_mode'] ?? 'all', 'ids' => $flat[$k.'_ids'] ?? []],
+                    'boards' => match (true) {
+                        $type === 'ticker' => ['mode' => 'only', 'ids' => $board === null || $board === '' ? [] : [$board]],
+                        in_array($type, self::MANY_TYPES, true) => ['mode' => 'exclude', 'ids' => $flat[$k.'_ids'] ?? []],
+                        default => ['mode' => 'all', 'ids' => []],
+                    },
                     'period' => $flat[$k.'_period'] ?? 'week',
                     'html' => $flat[$k.'_html'] ?? '',
                 ];
@@ -112,7 +162,7 @@ final class HomeLayoutForm
                 $k = "{$p}.{$key}";
                 $isTicker = ($form[$key.'_type'] ?? null) === 'ticker';
                 $rules[$k.'_type'] = ['required_with:'.$p, 'string', 'in:'.implode(',', $typeIds)];
-                $rules[$k.'_limit'] = ['required_with:'.$p, 'integer', 'min:1', 'max:'.($isTicker ? 10 : 20)];
+                $rules[$k.'_limit'] = ['required_with:'.$p, 'integer', 'min:'.self::LIMIT_MIN, 'max:'.self::LIMIT_MAX];
                 $rules[$k.'_mode'] = ['nullable', 'in:'.implode(',', HomeLayoutSettings::MODES)];
                 $rules[$k.'_ids'] = ['nullable', 'array', 'max:'.HomeLayoutSettings::MAX_BOARD_IDS];
                 $rules[$k.'_ids.*'] = ['integer', 'min:1'];

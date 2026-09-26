@@ -3,18 +3,54 @@
     "name": "Div",
     "if": "{{(_local.ui?.tab ?? 'layout') === 's__S__'}}",
     "props": {
-        "className": "mt-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 space-y-6"
+        "className": "mt-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6",
+        "style": {
+            "display": "flex",
+            "flexWrap": "wrap",
+            "gap": "1.5rem",
+            "alignItems": "flex-start"
+        },
+        "data-testid": "g7hw-admin-panel-s__S__"
     },
     "children": [
+        "__GUIDE__",
         {
             "type": "basic",
-            "name": "P",
-            "if": "{{!_local.form?.s__S___enabled}}",
+            "name": "Div",
             "props": {
-                "className": "alert-info text-sm"
+                "className": "space-y-4",
+                "style": {
+                    "flex": "7 1 0%",
+                    "minWidth": "22rem"
+                },
+                "data-testid": "g7hw-admin-right-s__S__"
             },
-            "text": "$t:g7-home-widgets.home.col.section_off"
-        },
-        "__COLS__"
+            "children": [
+                {
+                    "type": "basic",
+                    "name": "P",
+                    "if": "{{!_local.form?.s__S___enabled}}",
+                    "props": {
+                        "className": "alert-info text-sm",
+                        "data-testid": "g7hw-admin-off-s__S__"
+                    },
+                    "text": "$t:g7-home-widgets.home.col.section_off"
+                },
+                {
+                    "type": "basic",
+                    "name": "Div",
+                    "if": "{{!!_local.form?.s__S___enabled}}",
+                    "props": {
+                        "style": {
+                            "display": "flex",
+                            "flexWrap": "wrap",
+                            "gap": "1rem",
+                            "alignItems": "flex-start"
+                        }
+                    },
+                    "children": "__COLS__"
+                }
+            ]
+        }
     ]
 }
