@@ -5,6 +5,7 @@ namespace Plugins\G7\Home\Widgets\Listeners;
 use App\Contracts\Extension\HookListenerInterface;
 use App\Seo\Contracts\SeoCacheManagerInterface;
 use Illuminate\Support\Facades\Log;
+use Plugins\G7\Home\Widgets\Home\WebzineAddon;
 use Plugins\G7\Home\Widgets\Home\WidgetCache;
 use Plugins\G7\Home\Widgets\Support\BoardFilterSettings;
 
@@ -16,6 +17,10 @@ use Plugins\G7\Home\Widgets\Support\BoardFilterSettings;
  *   옛 위젯 데이터를 읽지 않는다({@see WidgetCache}).
  * - 이 플러그인 설정 저장(`core.plugin_settings.after_save`): 세대를 올리고 봇 홈 캐시도 지운다
  *   (섹션 구성이 바뀌므로).
+ * - g7-webzine-addon 활성·비활성(`core.plugins.activated`·`core.plugins.after_deactivate`): 웹진 칸이 웹진 ↔
+ *   최근글 대체로 바뀌므로 세대를 올리고 봇 홈 캐시를 지운다. 코어는 활성화 때만 SEO 캐시를 비우고
+ *   비활성화 때는 비우지 않아, 이것이 없으면 봇 홈이 캐시 수명(기본 2시간) 동안 웹진 화면으로 남는다
+ *   (릴리스 전 정리 묶음 C-4 에서 확인).
  */
 class HomeCacheGenerationListener implements HookListenerInterface
 {
@@ -29,6 +34,9 @@ class HomeCacheGenerationListener implements HookListenerInterface
         'sirsoft-board.board.after_update',
     ];
 
+    /** 애드온 활성·비활성 훅(코어가 플러그인 식별자 문자열을 첫 인자로 넘긴다) */
+    public const ADDON_TOGGLE_HOOKS = ['core.plugins.activated', 'core.plugins.after_deactivate'];
+
     public static function getSubscribedHooks(): array
     {
         $hooks = [];
@@ -36,6 +44,9 @@ class HomeCacheGenerationListener implements HookListenerInterface
             $hooks[$hook] = ['method' => 'onBoardDataChanged', 'priority' => 30];
         }
         $hooks['core.plugin_settings.after_save'] = ['method' => 'onSettingsSaved', 'priority' => 30];
+        foreach (self::ADDON_TOGGLE_HOOKS as $hook) {
+            $hooks[$hook] = ['method' => 'onPluginToggled', 'priority' => 30];
+        }
 
         return $hooks;
     }
@@ -61,7 +72,25 @@ class HomeCacheGenerationListener implements HookListenerInterface
             return;
         }
         $this->bump();
+        $this->invalidateBotHome();
+    }
 
+    /**
+     * 플러그인 활성·비활성 후 — 웹진 애드온일 때만 세대와 봇 홈 캐시를 무효화한다.
+     *
+     * @param  mixed  $identifier  플러그인 식별자(문자열이 아니면 무시)
+     */
+    public function onPluginToggled(mixed $identifier = null, mixed ...$rest): void
+    {
+        if ($identifier !== WebzineAddon::IDENTIFIER) {
+            return;
+        }
+        $this->bump();
+        $this->invalidateBotHome();
+    }
+
+    private function invalidateBotHome(): void
+    {
         try {
             app(SeoCacheManagerInterface::class)->invalidateByLayout('home');
         } catch (\Throwable $e) {
