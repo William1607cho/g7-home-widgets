@@ -3,7 +3,6 @@
 use Illuminate\Support\Facades\Route;
 use Plugins\G7\Home\Widgets\Http\Controllers\Admin\BoardFilterAdminController;
 use Plugins\G7\Home\Widgets\Http\Controllers\Admin\HomeFormAdminController;
-use Plugins\G7\Home\Widgets\Http\Controllers\BoardFilterDragScriptController;
 use Plugins\G7\Home\Widgets\Http\Controllers\HomeLayoutController;
 use Plugins\G7\Home\Widgets\Http\Controllers\NoticePostsController;
 use Plugins\G7\Home\Widgets\Http\Controllers\PopularPostsController;
@@ -39,10 +38,6 @@ Route::get('notice-posts', [NoticePostsController::class, 'index'])
 Route::get('home', [HomeLayoutController::class, 'index'])
     ->middleware(['optional.sanctum', 'throttle:600,1'])
     ->name('home.index');
-
-// 위젯 게시판 설정 화면의 카드 드래그 스크립트 (공개 — 설정 레이아웃의 scripts 가 로드, 0.3.0)
-Route::get('board-filter-drag.js', [BoardFilterDragScriptController::class, 'show'])
-    ->name('board-filter-drag-script');
 
 // 위젯 게시판 제외 설정(관리자, 0.3.0) — 최근글·인기글에서 뺄 게시판 ID 목록.
 // 조회는 코어 플러그인 조회 권한, 저장은 코어 플러그인 수정 권한(g7-webzine-addon 과 동일 표기).

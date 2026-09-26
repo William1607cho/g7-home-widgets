@@ -1,26 +1,10 @@
 {
-    "editor": {
-        "data_source": {
-            "board_filter": "Home widget boards"
-        }
-    },
     "settings": {
-        "title": "Home Widget Boards",
-        "description": "Choose which boards' posts appear in the home page recent and popular posts widgets.",
         "notice": "This only controls visibility and does not change read permissions. The notice ticker is not affected.",
-        "help": "Drag a card between the two areas, or use the X / + button on the card. New boards are included automatically.",
         "filter_placeholder": "Filter by board name or slug",
-        "included_title": "Included",
-        "included_hint": "Boards whose posts appear in the widgets",
         "excluded_title": "Not included",
-        "excluded_hint": "Boards whose posts are hidden from the widgets",
-        "empty_included": "No boards are included.",
-        "empty_excluded": "Drop a card here to hide that board from the widgets.",
-        "no_match": "No boards match this name.",
-        "inactive": "Inactive",
         "exclude": "Hide from widgets",
         "include": "Show in widgets",
-        "loading": "Loading boards…",
         "save_success": "Saved.",
         "save_error": "Failed to save."
     },
