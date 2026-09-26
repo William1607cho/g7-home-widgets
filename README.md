@@ -188,3 +188,21 @@ DB 테이블은 없습니다. 설정(`excluded_board_ids`, `home_layout`)은 플
 ## 라이선스
 
 MIT — [LICENSE](./LICENSE) 참고.
+
+## English summary
+
+A Gnuboard7 plugin for home pages built on `sirsoft-board`.
+
+- **0.4.0 home sections**: five sections (each on/off, one or two columns); each column shows recent
+  posts, popular posts, a news ticker, a gallery, a webzine-style list (needs
+  [g7-webzine-addon](https://github.com/William1607cho/g7-webzine-addon) 1.3.0+) or admin-written
+  HTML. Set it in **Admin → Home Page Settings**: per-column widget type, title, icon, item count
+  (1–20) and board choice. Bot (SSR) pages show the same sections. Post lists, read permission and
+  secret posts are left to `sirsoft-board`; template files are not modified.
+- Without the webzine add-on, webzine columns are drawn as recent posts (keeping their title, icon,
+  count and boards) and the admin screen marks the type "(add-on required)".
+- **Legacy APIs kept**: `recent-posts`, `popular-posts`, `notice-posts` and the `excluded_board_ids`
+  setting, used by template home widgets.
+- **Updating**: run `plugin:update` twice with the same package so the new hook listeners take effect.
+- **Rolling back to 0.3.0** removes the sections; the home overlay row stays, so each home visit makes
+  one extra request that returns 404 (no visible change).
