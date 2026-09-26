@@ -5,10 +5,11 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.4.0] - 2026-09-26
 
-Version `0.4.0` (not released yet) — home sections and the new settings screen. Needs
-g7-webzine-addon 1.3.0+ only for the optional webzine-style widget.
+Home sections and the new settings screen. Needs g7-webzine-addon 1.3.0+ only for the optional
+webzine-style widget. After updating, run `plugin:update` once more with the same package so the
+new hook listeners take effect.
 
 ### Added
 
