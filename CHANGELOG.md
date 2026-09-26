@@ -5,6 +5,16 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.1] - 2026-09-26
+
+### Changed
+
+- **Board name colour in list widgets** (recent posts, popular posts, webzine style) is now the
+  template's primary colour instead of blue — the same colour the template's own home widgets used
+  for board names (`--color-primary-600`, dark mode `--color-primary-400`). Templates without these
+  tokens get the same terracotta values as a fallback (`#cf5730` / `#e1937a`). Category names and
+  everything else look the same as before.
+
 ## [0.4.0] - 2026-09-26
 
 Home sections and the new settings screen. Needs g7-webzine-addon 1.3.0+ only for the optional

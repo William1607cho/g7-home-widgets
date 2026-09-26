@@ -13,6 +13,8 @@
     --g7hw-text: #111827;
     --g7hw-muted: #6b7280;
     --g7hw-accent: #2563eb;
+    /* 게시판 이름(0.4.1) — 템플릿 주 색 토큰, 없으면 wc-community 옛 홈 위젯과 같은 값(text-primary-600) */
+    --g7hw-board: var(--color-primary-600, #cf5730);
     --g7hw-hover: #f9fafb;
     --g7hw-tab-on-bg: #111827;
     --g7hw-tab-on-text: #fff;
@@ -30,6 +32,7 @@
     --g7hw-text: #fff;
     --g7hw-muted: #9ca3af;
     --g7hw-accent: #60a5fa;
+    --g7hw-board: var(--color-primary-400, #e1937a);
     --g7hw-hover: rgba(55, 65, 81, 0.5);
     --g7hw-tab-on-bg: #fff;
     --g7hw-tab-on-text: #111827;
@@ -183,7 +186,7 @@
 
 .g7hw-board {
     flex-shrink: 0;
-    color: var(--g7hw-accent);
+    color: var(--g7hw-board);
 }
 
 .g7hw-category {
