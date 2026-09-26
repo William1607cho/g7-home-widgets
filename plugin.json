@@ -8,8 +8,8 @@
     "version": "0.4.0",
     "license": "MIT",
     "description": {
-        "ko": "홈 화면에 게시판 구분 없이 사이트 전체 게시글을 시간순으로 통합해 보여주는 \"전체 최근글\" 위젯을 제공하는 애드온입니다. sirsoft-board 코어는 전혀 수정하지 않으며, 코어 모델(Post/Board)을 애드온 자체 쿼리로 직접 조회하고 게시판별 읽기 권한을 응답 시점에 필터링합니다.",
-        "en": "Provides a \"recent posts across all boards\" home-page widget without touching sirsoft-board core. Queries the core Post/Board models directly from the add-on's own code and applies per-board read-permission filtering at response time."
+        "ko": "홈 화면에 섹션 5개(켜기/끄기, 1단·2단)를 그리고 칸마다 최근글·인기글·뉴스 티커·갤러리·웹진 스타일(g7-webzine-addon 1.3.0 이상)·HTML 위젯을 고르는 플러그인입니다. 관리자 → 홈 화면 설정에서 정합니다. 템플릿 홈 위젯이 쓰는 전체 최근글·인기글·공지 티커 API 도 그대로 제공합니다. sirsoft-board 와 템플릿 파일은 수정하지 않으며, 글 목록·열람 권한·비밀글 판정은 sirsoft-board 에 맡깁니다.",
+        "en": "Draws five home-page sections (each on/off, one or two columns) and lets you pick a widget for each column: recent posts, popular posts, news ticker, gallery, webzine style (needs g7-webzine-addon 1.3.0+) or HTML — set in Admin → Home Page Settings. Still provides the recent, popular and notice-ticker APIs used by template home widgets. sirsoft-board and template files are not modified; post lists, read permission and secret posts are left to sirsoft-board."
     },
     "g7_version": ">=7.0.10",
     "dependencies": {

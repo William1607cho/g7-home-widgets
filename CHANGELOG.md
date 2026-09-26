@@ -7,7 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-Development version `0.4.0` (staging only). Part 1 of the home sections rework.
+Version `0.4.0` (not released yet) — home sections and the new settings screen. Needs
+g7-webzine-addon 1.3.0+ only for the optional webzine-style widget.
 
 ### Added
 
@@ -15,9 +16,10 @@ Development version `0.4.0` (staging only). Part 1 of the home sections rework.
   (each on/off, one or two columns; two columns are 1:1 and stack on narrow screens). It is
   injected into the home layout as an overlay (`resources/extensions/home.json`,
   `main_content`, before the template's own home content) — no template files change.
-  - Widget types in this release: **recent posts**, **popular posts** (This Week / This Month /
-    1 Year tabs, switched in the browser without another request) and **news ticker** (rolls one
-    line at a time, pauses on hover or focus, stays still with `prefers-reduced-motion`).
+  - Widget types: **recent posts**, **popular posts** (This Week / This Month / 1 Year tabs,
+    switched in the browser without another request), **news ticker** (rolls one line at a time,
+    pauses on hover or focus, stays still with `prefers-reduced-motion`), **gallery**,
+    **webzine style** and **HTML** (see below).
   - Default layout = the current home: section 1 two columns (recent · popular), section 2 one
     column (ticker on the `notice` board), sections 3–5 off. Default titles and icons are the
     same as the template widgets (Recent Posts · clock, Popular Posts · fire, Notice · bullhorn).
@@ -45,11 +47,11 @@ Development version `0.4.0` (staging only). Part 1 of the home sections rework.
     element underneath). Form keys left over from another admin screen are dropped on arrival.
   - The Columns select on the Widget Layout tab has a fixed width that fits its longest option on
     one line (the opened list uses the same width); on narrow screens it follows the row width.
-  Saving goes through the core plugin settings endpoint; the plugin
-  adds validation rules (items 1–20, a ticker with more than one board is rejected), converts the
-  form into `home_layout` before saving, never touches `excluded_board_ids`, and clears the widget
-  data cache and the cached bot home page after saving. New read endpoints
-  `GET /api/plugins/g7-home-widgets/admin/home-form` and `admin/home-meta` (`core.plugins.read`).
+  - Saving goes through the core plugin settings endpoint; the plugin adds validation rules
+    (items 1–20, a ticker with more than one board is rejected), converts the form into
+    `home_layout` before saving, never touches `excluded_board_ids`, and clears the widget data
+    cache and the cached bot home page after saving. New read endpoints
+    `GET /api/plugins/g7-home-widgets/admin/home-form` and `admin/home-meta` (`core.plugins.read`).
 - Recent and popular posts show "board name · category"; posts on wiki boards (the boards listed in
   g7-light-wiki's `wiki_boards` setting, read through the core settings helper) show the board name
   only.
@@ -61,16 +63,20 @@ Development version `0.4.0` (staging only). Part 1 of the home sections rework.
   list: thumbnail, title, summary, board name and category (no category on wiki boards) and date,
   1–20 items. Posts come from the same core path as the gallery (readable boards, `PostService`,
   `PostResource`); only the summary and thumbnail come from the add-on's public contract
-  `WebzineCards::cards()` — no add-on internals are used. Secret posts show the title only, a lock
-  in the thumbnail slot and no summary; posts without a thumbnail get the gallery's empty frame.
+  `WebzineCards::cards()` — no add-on internals are used. Secret posts always show the title only,
+  a lock in the thumbnail slot and no summary. A post without a thumbnail shows the add-on's
+  fallback image when the add-on has one set, otherwise the gallery's empty frame.
   - Add-on presence = the core reports the plugin active **and** the contract class exists with
     `VERSION >= 1`; checked once per request, so turning the add-on on or off shows on the next
     request.
-  - Without the add-on the type is a disabled choice in the admin screen, with a small preview
-    image (`resources/assets/webzine-preview.webp`, bundled, no external request — replace the
-    file to change it), a note and a link to the add-on repository. Columns already saved as
-    webzine are drawn as recent posts (browser and bot) and switch back when the add-on returns;
-    the saved settings are not changed.
+  - Without the add-on (not installed, turned off, or a version without the contract) the type is
+    a disabled choice labelled "(add-on required)". A column whose type is webzine also shows a
+    small preview image (`resources/assets/webzine-preview.webp`, bundled, no external request —
+    replace the file to change it), a note and a link to the add-on repository.
+  - Columns already saved as webzine are drawn as recent posts (browser and bot) with their own
+    title, icon, item count and board choice (empty title / icon → the recent-posts defaults), and
+    switch back when the add-on returns; the saved settings are not changed. Saving a webzine
+    column while the add-on is missing is allowed.
 - **HTML** widget — admin-written HTML, sanitized with the core `HtmlSanitizer` when saving and
   again when shown (browser `HtmlContent`, bot pages). Scripts, event attributes and
   `javascript:` links are removed.
@@ -100,11 +106,25 @@ Development version `0.4.0` (staging only). Part 1 of the home sections rework.
   a new post no longer shows the old list for the bot cache lifetime. Saving this plugin's
   settings also clears the cached bot home page.
 
+### Removed
+
+- The 0.3.0 settings screen (Included / Not included cards for one common list) and what only it
+  used: the drag script route `GET /api/plugins/g7-home-widgets/board-filter-drag.js` and its
+  translation keys. The admin API `GET` / `PUT admin/board-filter` stays (it is the only way to
+  edit `excluded_board_ids`, which the three old widget APIs still read).
+
 ### Unchanged
 
 - The three widget APIs used by the wc-community template (`recent-posts`, `popular-posts`,
   `notice-posts`) and their responses. The template widgets and the new sections are both shown
   until the template is cleaned up.
+
+### Rolling back to 0.3.0
+
+- `plugin:update` with the 0.3.0 package removes the new sections, but the home overlay row stays
+  in the database; each home visit then makes one extra request to the removed
+  `/api/plugins/g7-home-widgets/home` (404, no toast, nothing drawn). The `home_layout` key stays
+  in the settings file and is used again after updating back to 0.4.0. See README.
 
 ## [0.3.0] - 2026-09-17
 
