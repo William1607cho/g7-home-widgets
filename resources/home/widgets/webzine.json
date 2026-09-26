@@ -96,7 +96,27 @@
                                 {
                                     "type": "basic",
                                     "name": "Div",
-                                    "if": "{{!item.has_thumbnail}}",
+                                    "if": "{{!item.has_thumbnail && !item.is_secret && !!item.fallback_image}}",
+                                    "props": {
+                                        "className": "g7hw-wz-thumb g7hw-wz-fallback"
+                                    },
+                                    "children": [
+                                        {
+                                            "type": "basic",
+                                            "name": "Img",
+                                            "props": {
+                                                "src": "{{item.fallback_image}}",
+                                                "alt": "",
+                                                "loading": "lazy",
+                                                "className": "g7hw-thumb-img"
+                                            }
+                                        }
+                                    ]
+                                },
+                                {
+                                    "type": "basic",
+                                    "name": "Div",
+                                    "if": "{{!item.has_thumbnail && (item.is_secret || !item.fallback_image)}}",
                                     "props": {
                                         "className": "g7hw-wz-thumb g7hw-thumb-empty"
                                     },

@@ -39,13 +39,38 @@ class WebzineItemsTest extends TestCase
         $this->assertTrue($out[0]['has_thumbnail']);
     }
 
-    public function test_item_without_thumbnail_uses_empty_frame_not_fallback_image(): void
+    public function test_item_without_thumbnail_takes_addon_fallback_image(): void
     {
         $out = WebzineItems::apply([['id' => 4, 'is_secret' => false, 'thumbnail' => null]], [4 => ['summary' => '', 'thumbnail' => null, 'fallback_image' => '/fb.webp']]);
 
         $this->assertNull($out[0]['thumbnail']);
         $this->assertFalse($out[0]['has_thumbnail']);
+        $this->assertSame('/fb.webp', $out[0]['fallback_image']);
         $this->assertNull($out[0]['summary']);
+    }
+
+    public function test_item_without_thumbnail_and_no_fallback_setting_uses_empty_frame(): void
+    {
+        $out = WebzineItems::apply([['id' => 6, 'is_secret' => false, 'thumbnail' => null]], [6 => ['summary' => 's', 'thumbnail' => null, 'fallback_image' => null]]);
+
+        $this->assertNull($out[0]['fallback_image']);
+        $this->assertFalse($out[0]['has_thumbnail']);
+    }
+
+    public function test_secret_item_never_gets_fallback_image(): void
+    {
+        $out = WebzineItems::apply([['id' => 7, 'is_secret' => true, 'thumbnail' => null]], [7 => ['summary' => null, 'thumbnail' => null, 'fallback_image' => '/fb.webp']]);
+
+        $this->assertNull($out[0]['fallback_image']);
+        $this->assertNull($out[0]['thumbnail']);
+    }
+
+    public function test_item_with_thumbnail_ignores_fallback_image(): void
+    {
+        $out = WebzineItems::apply([['id' => 8, 'is_secret' => false, 'thumbnail' => '/t.jpg']], [8 => ['thumbnail' => '/t.jpg', 'fallback_image' => '/fb.webp']]);
+
+        $this->assertSame('/t.jpg', $out[0]['thumbnail']);
+        $this->assertNull($out[0]['fallback_image']);
     }
 
     public function test_missing_card_keeps_own_thumbnail_and_no_summary(): void

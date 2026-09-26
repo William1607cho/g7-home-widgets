@@ -179,6 +179,31 @@ final class HomeLayoutSettings
     }
 
     /**
+     * 쓸 수 없는 종류(애드온 없는 웹진 등)를 대체 종류로 그릴 칸.
+     *
+     * 사용자가 정한 제목·아이콘·개수·게시판 선택은 그대로 옮기고, 나머지(종류 전용 칸)는 대체 종류의
+     * 기본값을 쓴다. 개수는 대체 종류의 허용 범위로 자른다. 제목·아이콘이 비어 있으면 빈 채로 두어
+     * 조립기가 대체 종류의 기본 제목·아이콘을 붙인다. 설정값 자체는 바꾸지 않는다(표시용 칸).
+     *
+     * @param  array<string, mixed>  $col  정리된 원래 칸
+     * @return array<string, mixed>
+     */
+    public function fallbackCol(array $col, string $to): array
+    {
+        [$min, $max] = $this->registry->get($to)->limitRange();
+        $limit = self::toInt($col['limit'] ?? null);
+        $base = $this->defaultCol($to);
+
+        return [
+            'type' => $to,
+            'title' => (string) ($col['title'] ?? ''),
+            'icon' => (string) ($col['icon'] ?? ''),
+            'limit' => $limit === null ? $base['limit'] : max($min, min($max, $limit)),
+            'boards' => $col['boards'] ?? $base['boards'] ?? ['mode' => 'all', 'ids' => []],
+        ] + $base;
+    }
+
+    /**
      * @param  mixed  $in  입력 `boards`
      * @param  array{mode: string, ids: array<int, int>}  $default  기본값
      * @return array{mode: string, ids: array<int, int>}

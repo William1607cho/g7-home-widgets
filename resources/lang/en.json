@@ -102,6 +102,9 @@
             "webzine": "Webzine style",
             "html": "HTML"
         },
+        "types_addon": {
+            "webzine": "Webzine style (add-on required)"
+        },
         "periods": {
             "week": "This Week",
             "month": "This Month",

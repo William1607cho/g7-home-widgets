@@ -102,6 +102,9 @@
             "webzine": "웹진 스타일",
             "html": "HTML"
         },
+        "types_addon": {
+            "webzine": "웹진 스타일 (애드온 필요)"
+        },
         "periods": {
             "week": "이번주",
             "month": "이번달",

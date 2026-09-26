@@ -15,7 +15,8 @@ use Plugins\G7\Home\Widgets\Home\WikiBoards;
  *
  * 글 목록은 갤러리와 같은 코어 경로({@see BoardGallerySource}: `PostService`·`PostResource`, 열람 가능
  * 게시판)로 얻고, 요약·썸네일만 g7-webzine-addon 공개 계약으로 받는다({@see WebzineAddon}).
- * 비밀글은 제목만 보이고 썸네일 자리는 자물쇠, 요약은 없다. 위키 게시판 글은 분류를 뺀다.
+ * 비밀글은 제목만 보이고 썸네일 자리는 자물쇠, 요약은 없다. 썸네일 없는 일반 글은 애드온 설정의 대체
+ * 이미지가 있으면 그것, 없으면 대체 틀. 위키 게시판 글은 분류를 뺀다.
  *
  * 애드온이 없거나 꺼지면 쓸 수 없는 종류가 되고, 조립기가 최근글로 대신 그린다(설정은 그대로).
  */
@@ -23,7 +24,7 @@ final class WebzineWidget implements HomeWidget
 {
     /** 응답에 싣는 항목 키 */
     public const ITEM_KEYS = ['id', 'board_slug', 'board_name', 'title', 'category', 'summary', 'thumbnail',
-        'has_thumbnail', 'is_secret', 'created_at', 'created_at_formatted'];
+        'has_thumbnail', 'fallback_image', 'is_secret', 'created_at', 'created_at_formatted'];
 
     public function __construct(
         private readonly BoardGallerySource $source,

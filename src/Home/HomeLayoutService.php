@@ -54,8 +54,9 @@ final class HomeLayoutService
                     continue;
                 }
                 if ($widget->id() !== $col['type']) {
+                    // 대체 지점은 여기 한 곳 — 제목·아이콘·개수·게시판 선택은 사용자 값을 유지한다(설정은 그대로).
                     $fallbacks[] = ['key' => $cKey, 'from' => $col['type'], 'to' => $widget->id()];
-                    $col = ['boards' => $col['boards']] + $settings->defaultCol($widget->id());
+                    $col = $settings->fallbackCol($col, $widget->id());
                 }
                 $cols[] = $this->buildCol($cKey, $widget, $col, $scope);
             }

@@ -186,4 +186,28 @@ class HomeLayoutSettingsTest extends TestCase
 
         $this->assertCount(HomeLayoutSettings::MAX_BOARD_IDS, $ids);
     }
+
+    public function test_fallback_col_keeps_user_title_icon_limit_and_boards(): void
+    {
+        $col = ['type' => 'webzine', 'title' => '웹진 시험 B', 'icon' => 'book-open', 'limit' => 7,
+            'boards' => ['mode' => 'exclude', 'ids' => [1, 2]]];
+
+        $out = $this->settings()->fallbackCol($col, 'recent');
+
+        $this->assertSame('recent', $out['type']);
+        $this->assertSame('웹진 시험 B', $out['title']);
+        $this->assertSame('book-open', $out['icon']);
+        $this->assertSame(7, $out['limit']);
+        $this->assertSame(['mode' => 'exclude', 'ids' => [1, 2]], $out['boards']);
+    }
+
+    public function test_fallback_col_leaves_empty_title_and_icon_for_default_and_clamps_limit(): void
+    {
+        $out = $this->settings()->fallbackCol(['type' => 'webzine', 'title' => '', 'icon' => '', 'limit' => 99,
+            'boards' => ['mode' => 'exclude', 'ids' => []]], 'recent');
+
+        $this->assertSame('', $out['title']);
+        $this->assertSame('', $out['icon']);
+        $this->assertSame(20, $out['limit']);
+    }
 }
