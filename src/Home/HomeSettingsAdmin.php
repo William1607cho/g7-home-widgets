@@ -15,24 +15,16 @@ use Plugins\G7\Home\Widgets\Support\BoardFilterSettings;
  * - **`excluded_board_ids` 는 새 화면 저장에서 절대 건드리지 않는다**(옛 위젯 API 3종이 계속 쓴다). 요청에
  *   섞여 와도 버려서 코어 저장 병합이 기존 값을 그대로 남기게 한다({@see HomeLayoutForm::keepLegacyKey()}).
  *   0.3.0 게시판 제외 API(`PUT admin/board-filter`) 경로는 예전처럼 이 키만 저장한다.
- * - {@see self::meta()}: 화면용 활성 게시판 목록과 안내 이미지 주소. `GET admin/home-meta`.
+ * - {@see self::meta()}: 화면용 활성 게시판 목록, 제목 아이콘 허용 목록, 종류별 기본 아이콘. `GET admin/home-meta`.
  *
  * 게시판 목록은 코어 `BoardService::getActiveBoards()` 로만 얻는다(이 클래스는 쿼리를 쓰지 않는다).
  */
 final class HomeSettingsAdmin
 {
-    /** 안내 이미지 자리(탭별 1개) — 플러그인 루트 기준 폴더 */
-    public const GUIDE_DIR = 'resources/assets/admin-guide';
-
-    /** 안내 이미지 이름(탭 키 → 파일 이름 앞부분) */
-    public const GUIDE_NAMES = ['layout' => 'layout', 's1' => 'section-1', 's2' => 'section-2', 's3' => 'section-3', 's4' => 'section-4', 's5' => 'section-5'];
-
-    /** 안내 이미지 형식(앞에서부터 찾는다) */
-    public const GUIDE_EXTENSIONS = ['webp', 'png', 'jpg'];
-
     public function __construct(
         private readonly HomeLayoutSettings $settings,
         private readonly BoardService $boards,
+        private readonly WidgetRegistry $registry,
     ) {}
 
     /**
@@ -51,9 +43,9 @@ final class HomeSettingsAdmin
     }
 
     /**
-     * 화면용 메타: 활성 게시판(칩·티커 선택지)과 탭별 안내 이미지 주소(없으면 null → 자리표시 틀).
+     * 화면용 메타: 활성 게시판(칩·티커 선택지), 제목 아이콘 허용 목록(격자 선택기), 종류별 기본 아이콘(격자 첫 칸).
      *
-     * @return array{boards: array<int, array{id: int, name: string, slug: string}>, guides: array<string, string|null>}
+     * @return array{boards: array<int, array{id: int, name: string, slug: string}>, icons: array<int, string>, type_icons: array<string, string>}
      */
     public function meta(): array
     {
@@ -63,20 +55,12 @@ final class HomeSettingsAdmin
             'slug' => (string) $b->slug,
         ])->values()->all();
 
-        $root = dirname(__DIR__, 2);
-        $guides = [];
-        foreach (self::GUIDE_NAMES as $tab => $name) {
-            $guides[$tab] = null;
-            foreach (self::GUIDE_EXTENSIONS as $ext) {
-                $rel = self::GUIDE_DIR.'/'.$name.'.'.$ext;
-                if (is_file($root.'/'.$rel)) {
-                    $guides[$tab] = '/api/plugins/assets/'.BoardFilterSettings::IDENTIFIER.'/'.$rel.'?v='.filemtime($root.'/'.$rel);
-                    break;
-                }
-            }
+        $typeIcons = [];
+        foreach ($this->registry->ids() as $id) {
+            $typeIcons[$id] = $this->registry->get($id)->defaultIcon();
         }
 
-        return ['boards' => $boards, 'guides' => $guides];
+        return ['boards' => $boards, 'icons' => HomeIcons::load(), 'type_icons' => $typeIcons];
     }
 
     /**

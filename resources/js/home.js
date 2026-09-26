@@ -9,10 +9,17 @@
  *   `prefers-reduced-motion: reduce` 이거나 1건이면 움직이지 않는다. 마지막 줄 다음에는
  *   애니메이션 없이 첫 줄로 돌아간다.
  * - 네트워크 요청·저장소 접근 없음. React 가 관리하지 않는 `style`·`data-index` 만 바꾼다.
+ * - 관리자 설정 화면 보조: 칩 끌기(initAdminDrag), 열린 선택 상자·아이콘 격자 바깥 클릭 막기(initAdminOutsideGuard).
  * scripts/build-home.sh 가 이 파일을 dist/js/plugin.iife.js 로 복사한다(원본은 이 파일).
  */
 (function () {
     'use strict';
+
+    // 번들이 두 번 실행돼도(확장 자산 재로딩 등) 핸들러·감시·문서 리스너를 한 벌만 둔다.
+    if (window.__g7HomeWidgetsLoaded) {
+        return;
+    }
+    window.__g7HomeWidgetsLoaded = true;
 
     var ID = 'g7-home-widgets';
     var ROW_REM = 1.5;
@@ -226,10 +233,87 @@
         });
     }
 
+    /*
+     * 관리자 설정 화면 — 열린 선택 상자·아이콘 격자 바깥 클릭은 "닫기만"(관리자 화면 2차 보완 10번).
+     * 관리자 템플릿의 선택 상자는 바깥 mousedown 에 닫히지만 그 클릭을 막지 않아, 닫으려고 누른 자리의
+     * 체크박스·버튼·다른 선택 상자가 함께 눌린다. 이 화면(`g7hw-admin-*` 안의 선택 상자, `data-hw-icon-grid`)
+     * 에서만: 열린 것이 있고 바깥을 누르면 mousedown 은 선택 상자가 닫히도록 그대로 흘려보내되 기본 동작
+     * (포커스 이동)을 막고, 이어지는 click 은 가장 먼저(window 캡처 단계) 삼킨다. 격자는 토글 버튼을 대신
+     * 눌러 닫는다. 다른 화면의 선택 상자는 건드리지 않는다. 요청·저장소 접근 없음.
+     */
+    function initAdminOutsideGuard() {
+        if (window.__g7HomeWidgetsAdminGuard) {
+            return;
+        }
+        window.__g7HomeWidgetsAdminGuard = true;
+        var swallow = null;
+        var openSelect = function () {
+            var buttons = document.querySelectorAll('button[aria-haspopup="listbox"][aria-expanded="true"]');
+            for (var i = 0; i < buttons.length; i++) {
+                if (buttons[i].closest('[data-testid^="g7hw-admin-"]')) {
+                    return buttons[i];
+                }
+            }
+            return null;
+        };
+        var openGrid = function () {
+            return document.querySelector('[data-hw-icon-grid]');
+        };
+        var toggleOf = function (grid) {
+            var key = grid.getAttribute('data-hw-icon-grid') || '';
+            return /^s[1-5]c[12]$/.test(key) ? document.querySelector('[data-hw-icon-toggle="' + key + '"]') : null;
+        };
+        var closeGrid = function (grid) {
+            var toggle = toggleOf(grid);
+            if (toggle) {
+                toggle.click();
+            }
+        };
+        window.addEventListener('mousedown', function (event) {
+            swallow = null;
+            if (event.button !== 0) {
+                return;
+            }
+            var target = event.target;
+            var select = openSelect();
+            var grid = openGrid();
+            if (!select && !grid) {
+                return;
+            }
+            var inSelect = select && (select.parentElement.contains(target) || !!(target.closest && target.closest('[role="listbox"]')));
+            var toggle = grid ? toggleOf(grid) : null;
+            var inGrid = grid && (grid.contains(target) || (toggle && toggle.contains(target)));
+            if ((select && inSelect) || (grid && inGrid)) {
+                return;
+            }
+            event.preventDefault();
+            swallow = { grid: grid, at: Date.now() };
+        }, true);
+        window.addEventListener('click', function (event) {
+            var s = swallow;
+            swallow = null;
+            if (!s || Date.now() - s.at > 2000) {
+                return;
+            }
+            event.preventDefault();
+            event.stopPropagation();
+            if (s.grid && document.contains(s.grid)) {
+                closeGrid(s.grid);
+            }
+        }, true);
+        document.addEventListener('keydown', function (event) {
+            var grid = event.key === 'Escape' ? openGrid() : null;
+            if (grid) {
+                closeGrid(grid);
+            }
+        });
+    }
+
     function init() {
         registerHandlers();
         watch();
         initAdminDrag();
+        initAdminOutsideGuard();
     }
 
     if (document.readyState === 'loading') {

@@ -25,7 +25,7 @@ class HomeFormAdminController extends AdminBaseController
     }
 
     /**
-     * 화면용 메타(활성 게시판 목록, 탭별 안내 이미지 주소) — `GET admin/home-meta`.
+     * 화면용 메타(활성 게시판 목록, 제목 아이콘 허용 목록, 종류별 기본 아이콘) — `GET admin/home-meta`.
      */
     public function meta(): JsonResponse
     {

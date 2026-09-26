@@ -139,7 +139,7 @@ class Plugin extends AbstractPlugin
     {
         return [
             [
-                'name' => ['ko' => '홈 위젯 게시판 설정', 'en' => 'Home Widget Boards'],
+                'name' => ['ko' => '홈 화면 설정', 'en' => 'Home Page Settings'],
                 'slug' => 'g7-home-widgets-settings',
                 'url' => '/admin/plugins/g7-home-widgets/settings',
                 'icon' => 'fas fa-house',

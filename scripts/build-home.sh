@@ -73,24 +73,33 @@ stamp() { # 파일 [찾을 문자열 바꿀 문자열]... → 모든 문자열 �
   jq "${args[@]}" "$prog" "$f"
 }
 jq -c '[.[] | {value: ., label: ("$t:g7-home-widgets.home.types." + .)}]' "$registry" > "$work/type_opts.json"
-jq -c '[{value: "", label: "$t:g7-home-widgets.home.col.default_icon"}] + [.icons[] | {value: ., label: .}]' "$root/resources/home/icons.json" > "$work/icon_opts.json"
 for t in layout s1 s2 s3 s4 s5; do stamp "$admin/tab.json" __TAB__ "$t"; done | jq -s '.' > "$work/tabs.json"
 for s in 1 2 3 4 5; do stamp "$admin/section-row.json" __S__ "$s"; done | jq -s '.' > "$work/rows.json"
-stamp "$admin/guide.json" __GUIDE__ layout | jq 'del(._comment)' > "$work/guide_layout.json"
+for s in 1 2 3 4 5; do stamp "$admin/preview-box.json" __S__ "$s" | jq 'del(._comment)'; done | jq -s '.' > "$work/boxes.json"
+# 칸 하위 탭 이름: "왼쪽 칸 · <종류>" — 종류 이름은 등록부 순서로 종류마다 Span 하나(해당 종류일 때만 보임).
+subtab_label() { # 섹션 칸
+  jq -c --arg s "$1" --arg c "$2" '
+    [{type: "basic", name: "Span", text: ("$t:g7-home-widgets.home.col.card" + $c)},
+     {type: "basic", name: "Span", props: {className: "mx-1 text-gray-400"}, text: "·"}]
+    + [.[] as $t | {type: "basic", name: "Span", "if": ("{{_local.form?.s" + $s + "c" + $c + "_type === '"'"'" + $t + "'"'"'}}"), text: ("$t:g7-home-widgets.home.types." + $t)}]
+  ' "$registry"
+}
 : > "$work/panels.ndjson"
 for s in 1 2 3 4 5; do
   for c in 1 2; do
-    stamp "$admin/col-card.json" __K__ "s${s}c${c}" __S__ "$s" __C__ "$c" \
-      | jq --slurpfile o "$work/type_opts.json" --slurpfile i "$work/icon_opts.json" "$FILL del(._comment) | fill(\"__TYPE_OPTIONS__\"; \$o[0]) | fill(\"__ICON_OPTIONS__\"; \$i[0])"
+    stamp "$admin/column.json" __K__ "s${s}c${c}" __S__ "$s" __C__ "$c" \
+      | jq --slurpfile o "$work/type_opts.json" "$FILL del(._comment) | fill(\"__TYPE_OPTIONS__\"; \$o[0])"
   done | jq -s '.' > "$work/cols.json"
-  stamp "$admin/guide.json" __GUIDE__ "s$s" | jq 'del(._comment)' > "$work/guide.json"
+  subtab_label "$s" 1 > "$work/sub1.json"
+  subtab_label "$s" 2 > "$work/sub2.json"
   stamp "$admin/section-panel.json" __S__ "$s" \
-    | jq --slurpfile c "$work/cols.json" --slurpfile g "$work/guide.json" "$FILL fill(\"__COLS__\"; \$c[0]) | fill(\"__GUIDE__\"; \$g[0])" >> "$work/panels.ndjson"
+    | jq --slurpfile c "$work/cols.json" --slurpfile l1 "$work/sub1.json" --slurpfile l2 "$work/sub2.json" \
+      "$FILL fill(\"__COLS__\"; \$c[0]) | fill(\"__SUBTAB_LABEL_C1__\"; \$l1[0]) | fill(\"__SUBTAB_LABEL_C2__\"; \$l2[0])" >> "$work/panels.ndjson"
 done
 jq -s '.' "$work/panels.ndjson" > "$work/panels.json"
-# 관리자 화면 생성물은 한 줄(compact)로 쓴다 — 칸 10개 × 아이콘 선택지 141개라 들여쓰기하면 파일이 커진다.
-jq -c --slurpfile tabs "$work/tabs.json" --slurpfile rows "$work/rows.json" --slurpfile gl "$work/guide_layout.json" --slurpfile panels "$work/panels.json" \
-  "$FILL del(._comment) | fill(\"__TABS__\"; \$tabs[0]) | fill(\"__SECTION_ROWS__\"; \$rows[0]) | fill(\"__GUIDE_LAYOUT__\"; \$gl[0]) | fill(\"__SECTION_PANELS__\"; \$panels[0])" \
+# 관리자 화면 생성물은 한 줄(compact)로 쓴다 — 칸 10개라 들여쓰기하면 파일이 커진다.
+jq -c --slurpfile tabs "$work/tabs.json" --slurpfile rows "$work/rows.json" --slurpfile boxes "$work/boxes.json" --slurpfile panels "$work/panels.json" \
+  "$FILL del(._comment) | fill(\"__TABS__\"; \$tabs[0]) | fill(\"__SECTION_ROWS__\"; \$rows[0]) | fill(\"__PREVIEW_BOXES__\"; \$boxes[0]) | fill(\"__SECTION_PANELS__\"; \$panels[0])" \
   "$admin/page.base.json" > "$work/plugin_settings.json"
 
 cp "$root/resources/css/home.css" "$work/plugin.css"
@@ -129,13 +138,21 @@ for name in $lit $php_icons; do
 done
 echo "icons checked: $(echo $lit $php_icons | wc -w) (outside subset: $missing)"
 
-# 관리자 화면: 남은 자리표시 0, 노드 id 중복 0, 칸 패널 10개, 탭 6개
+# 관리자 화면: 남은 자리표시 0, 노드 id 중복 0, 칸 10개, 미리보기 상자 5개, 칸 하위 탭 묶음 5개, 탭 6개, 안내 이미지 흔적 0
 left=$(grep -c '__[A-Z_]*__' "$work/plugin_settings.json" || true)
 adups=$(jq '[.. | objects | select(has("type") and has("name")) | .id // empty] | group_by(.) | map(select(length > 1)) | length' "$work/plugin_settings.json")
 apanels=$(jq '[.. | objects | select(.props?["data-testid"]? // "" | test("^g7hw-admin-s[1-5]c[12]$"))] | length' "$work/plugin_settings.json")
-aguides=$(jq '[.. | objects | select(.props?["data-testid"]? // "" | test("^g7hw-admin-guide-(layout|s[1-5])$"))] | length' "$work/plugin_settings.json")
-echo "admin: placeholders left=$left duplicate ids=$adups col cards=$apanels guides=$aguides tabs=$(jq 'length' "$work/tabs.json")"
-[ "$left" -eq 0 ] && [ "$adups" -eq 0 ] && [ "$apanels" -eq 10 ] && [ "$aguides" -eq 6 ] || fail "관리자 화면 생성 검사"
+aboxes=$(jq '[.. | objects | select(.props?["data-testid"]? // "" | test("^g7hw-admin-box-s[1-5]$"))] | length' "$work/plugin_settings.json")
+asubs=$(jq '[.. | objects | select(.props?["data-testid"]? // "" | test("^g7hw-admin-subtabs-s[1-5]$"))] | length' "$work/plugin_settings.json")
+aguides=$(grep -c 'g7hw-admin-guide\|admin-guide\|home\.guide\.' "$work/plugin_settings.json" || true)
+echo "admin: placeholders left=$left duplicate ids=$adups columns=$apanels preview boxes=$aboxes subtab groups=$asubs guide traces=$aguides tabs=$(jq 'length' "$work/tabs.json")"
+[ "$left" -eq 0 ] && [ "$adups" -eq 0 ] && [ "$apanels" -eq 10 ] && [ "$aboxes" -eq 5 ] && [ "$asubs" -eq 5 ] && [ "$aguides" -eq 0 ] || fail "관리자 화면 생성 검사"
+# 화면이 쓰는 번역 키(home.*)가 ko·en 에 모두 있어야 한다.
+for lang in ko en; do
+  miss=$(grep -o '\$t:g7-home-widgets\.[a-z_.0-9]*' "$work/plugin_settings.json" | sort -u | sed 's/^\$t:g7-home-widgets\.//' \
+    | while IFS= read -r k; do jq -e --arg k "$k" 'getpath($k | split(".")) | type == "string"' "$root/resources/lang/$lang.json" > /dev/null || echo "$k"; done)
+  [ -z "$miss" ] || fail "번역 키 없음($lang): $(echo $miss)"
+done
 
 # 모든 children 은 객체만 담은 배열이어야 한다(배열 안 배열·문자열 0) — 자리표시가 잘못 끼면 렌더러가 그리지 않는다.
 BADCH='[.. | objects | select(has("children")) | .children | if type == "array" then .[] | select(type != "object") else "not-array" end] | length'

@@ -2,8 +2,39 @@
     "type": "basic",
     "name": "Div",
     "props": {
-        "className": "flex flex-wrap items-center gap-4 p-3 rounded-lg border border-gray-100 dark:border-gray-700"
+        "className": "flex flex-wrap items-center gap-4 p-3 rounded-lg border border-gray-100 dark:border-gray-700",
+        "tabIndex": 0,
+        "data-testid": "g7hw-admin-row-s__S__",
+        "style": {
+            "borderColor": "{{(_local.hwHover ?? _local.hwFocus) === __S__ ? '#2563eb' : ''}}"
+        }
     },
+    "actions": [
+        {
+            "type": "mouseenter",
+            "handler": "setState",
+            "params": {
+                "target": "local",
+                "hwHover": "{{__S__}}"
+            }
+        },
+        {
+            "type": "mouseleave",
+            "handler": "setState",
+            "params": {
+                "target": "local",
+                "hwHover": null
+            }
+        },
+        {
+            "type": "focus",
+            "handler": "setState",
+            "params": {
+                "target": "local",
+                "hwFocus": "{{__S__}}"
+            }
+        }
+    ],
     "children": [
         {
             "type": "basic",

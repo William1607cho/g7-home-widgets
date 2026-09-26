@@ -1,5 +1,5 @@
 {
-    "_comment": "홈 화면 설정 화면 원본(틀). scripts/build-home.sh 가 \"__TABS__\"(tab.json ×6), \"__GUIDE__\"(guide.json), \"__SECTION_ROWS__\"(section-row.json ×5), \"__SECTION_PANELS__\"(section-panel.json ×5, 칸 col-card.json ×2)를 채워 resources/layouts/admin/plugin_settings.json 을 만든다. 모든 탭 = 왼쪽 안내(3) : 오른쪽 내용(7), 좁은 화면은 세로로 쌓인다.",
+    "_comment": "홈 화면 설정 화면 원본(틀). scripts/build-home.sh 가 \"__TABS__\"(tab.json ×6), \"__PREVIEW_BOXES__\"(preview-box.json ×5), \"__SECTION_ROWS__\"(section-row.json ×5), \"__SECTION_PANELS__\"(section-panel.json ×5, 칸 column.json ×2)를 채워 resources/layouts/admin/plugin_settings.json 을 만든다. [위젯 레이아웃] 탭 = 왼쪽 섹션 박스 미리보기(3) : 오른쪽 섹션 줄(7), 좁은 화면은 세로로 쌓인다. 섹션 탭은 설정 영역만(폭 100%).",
     "version": "1.0.0",
     "layout_name": "plugin_settings",
     "permissions": ["core.plugins.read"],
@@ -17,7 +17,10 @@
             "method": "GET",
             "auto_fetch": true,
             "auth_required": true,
-            "initLocal": "form",
+            "initLocal": {
+                "_merge": "replace",
+                "form": "{{data}}"
+            },
             "refetchOnMount": true
         },
         {
@@ -111,7 +114,46 @@
                             "data-testid": "g7hw-admin-panel-layout"
                         },
                         "children": [
-                            "__GUIDE_LAYOUT__",
+                            {
+                                "id": "section_preview",
+                                "type": "basic",
+                                "name": "Div",
+                                "props": {
+                                    "className": "space-y-3",
+                                    "style": {
+                                        "flex": "3 1 0%",
+                                        "minWidth": "14rem"
+                                    },
+                                    "data-testid": "g7hw-admin-preview"
+                                },
+                                "children": [
+                                    {
+                                        "type": "basic",
+                                        "name": "H3",
+                                        "props": {
+                                            "className": "text-base font-semibold text-gray-900 dark:text-white"
+                                        },
+                                        "text": "$t:g7-home-widgets.home.preview.title"
+                                    },
+                                    {
+                                        "type": "basic",
+                                        "name": "P",
+                                        "props": {
+                                            "className": "text-sm text-gray-500 dark:text-gray-400"
+                                        },
+                                        "text": "$t:g7-home-widgets.home.preview.help"
+                                    },
+                                    {
+                                        "type": "basic",
+                                        "name": "Div",
+                                        "props": {
+                                            "className": "space-y-2",
+                                            "data-testid": "g7hw-admin-preview-boxes"
+                                        },
+                                        "children": "__PREVIEW_BOXES__"
+                                    }
+                                ]
+                            },
                             {
                                 "id": "section_rows",
                                 "type": "basic",

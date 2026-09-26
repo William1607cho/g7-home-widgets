@@ -36,7 +36,8 @@ time, so it can add fields (such as `category`) that the core home APIs do not r
   - `board` (required): board slug. `limit`: default 5, clamped to 10.
   - Fields: `id`, `board_slug`, `title`, `created_at`, `created_at_formatted` — **no author fields**.
   - Missing board, invalid slug or no read permission → `data: []` (never an error).
-- **Widget board settings** (0.3.0+) — **Admin → 홈 위젯 게시판 설정 / Home Widget Boards**
+- **Widget board settings** (0.3.0+) — **Admin → 홈 화면 설정 / Home Page Settings** (named
+  "홈 위젯 게시판 설정 / Home Widget Boards" before 0.4.0)
   (`/admin/plugins/g7-home-widgets/settings`)
   - Choose which boards the recent and popular posts widgets leave out. The notice ticker is
     not affected.

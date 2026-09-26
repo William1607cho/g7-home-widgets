@@ -23,16 +23,26 @@ Development version `0.4.0` (staging only). Part 1 of the home sections rework.
     same as the template widgets (Recent Posts · clock, Popular Posts · fire, Notice · bullhorn).
   - Settings key `home_layout` (plugin settings file). When it is absent the defaults above are
     used; nothing is written on update.
-- **Admin screen "Home Page Settings"** (`/admin/plugins/g7-home-widgets/settings`, same menu
-  entry) with tabs **Widget Layout** (each section on/off and 1 or 2 columns) and **Section 1–5**.
-  Every tab is split 3 : 7 — a guide on the left (an image slot plus a short explanation of where
-  the section sits on the home page; drop `resources/assets/admin-guide/<layout|section-1…5>.webp`
-  (or .png/.jpg) into the plugin to show a picture, otherwise a placeholder box) and the settings
-  on the right; it stacks on narrow screens. A section tab shows one card per column (left/right
-  for two columns): widget type → title and icon → number of items (1–20) → board choice (recent,
-  popular, gallery: the 0.3.0 card screen with search, "Included" / "Not included" areas, drag or
-  X / + buttons, saved as the "not included" list so new boards are included automatically; ticker:
-  one board) or the HTML box. Saving goes through the core plugin settings endpoint; the plugin
+- **Admin screen "Home Page Settings"** (`/admin/plugins/g7-home-widgets/settings`; the admin
+  menu entry is renamed from "홈 위젯 게시판 설정" / "Home Widget Boards" to "홈 화면 설정" /
+  "Home Page Settings" — display name
+  only, same menu id, permission and path) with tabs **Widget Layout** and **Section 1–5**.
+  - Widget Layout: five dashed boxes on the left show sections 1–5 as currently set (sections
+    that are off are dimmed, two-column sections are split left/right) and update before saving;
+    the rows on the right set each section on/off and 1 or 2 columns, and hovering, clicking or
+    focusing a row highlights its box. Stacks on narrow screens.
+  - Section tabs use the full width. A two-column section has sub-tabs "Left column · <widget>" /
+    "Right column · <widget>" (the name follows the widget type as it changes); a section that is
+    off only shows a note to turn it on in Widget Layout.
+  - Each column: widget type → title and icon (an icon grid picker: search, 8 columns, name on
+    hover, check on the selected icon, first cell = the widget type's default icon; the 141-icon
+    allow-list) → number of items (1–20) → board choice (recent, popular, gallery: cards with drag
+    handle, board name and slug, search, "Included" / "Not included" areas, drag or X / + buttons,
+    "Select all" / "Deselect all" that act on the search results when a search term is set; saved as
+    the "not included" list so new boards are included automatically; ticker: one board) or the
+    HTML box.
+  - Clicking outside an open select box or icon grid only closes it (the click does not reach the
+    element underneath). Form keys left over from another admin screen are dropped on arrival. Saving goes through the core plugin settings endpoint; the plugin
   adds validation rules (items 1–20, a ticker with more than one board is rejected), converts the
   form into `home_layout` before saving, never touches `excluded_board_ids`, and clears the widget
   data cache and the cached bot home page after saving. New read endpoints

@@ -9,7 +9,7 @@
         "description": "Choose which boards' posts appear in the home page recent and popular posts widgets.",
         "notice": "This only controls visibility and does not change read permissions. The notice ticker is not affected.",
         "help": "Drag a card between the two areas, or use the X / + button on the card. New boards are included automatically.",
-        "filter_placeholder": "Filter by board name",
+        "filter_placeholder": "Filter by board name or slug",
         "included_title": "Included",
         "included_hint": "Boards whose posts appear in the widgets",
         "excluded_title": "Not included",
@@ -27,15 +27,26 @@
     "home": {
         "title": "Home Page Settings",
         "description": "Turn the five home sections on or off, choose one or two columns and pick the widget for each column.",
-        "guide": {
-            "alt": "Home page guide",
-            "placeholder": "Guide image",
-            "layout": "Where sections 1 to 5 sit on the home page: they stack from the top in order 1, 2 … 5, above the old home widgets. Turn each section on or off and choose 1 or 2 columns here.",
-            "s1": "Section 1 is the first of the new sections at the top of the home page. With 2 columns the left and right columns sit side by side (1:1) and stack on narrow screens.",
-            "s2": "Section 2 sits right below section 1. With 2 columns the left and right columns sit side by side (1:1) and stack on narrow screens.",
-            "s3": "Section 3 sits right below section 2. With 2 columns the left and right columns sit side by side (1:1) and stack on narrow screens.",
-            "s4": "Section 4 sits right below section 3. With 2 columns the left and right columns sit side by side (1:1) and stack on narrow screens.",
-            "s5": "Section 5 is the last new section, right above the old home widgets. With 2 columns the left and right columns sit side by side (1:1) and stack on narrow screens."
+        "preview": {
+            "title": "Section layout",
+            "help": "Sections sit on the home page from the top in order 1 to 5. Hover over a row on the right or click it to highlight that section's box. Changes to On and Columns show in the boxes right away, before saving; sections that are off are dimmed.",
+            "s1": "Section 1",
+            "s2": "Section 2",
+            "s3": "Section 3",
+            "s4": "Section 4",
+            "s5": "Section 5",
+            "s1_off": "Section 1 (off)",
+            "s2_off": "Section 2 (off)",
+            "s3_off": "Section 3 (off)",
+            "s4_off": "Section 4 (off)",
+            "s5_off": "Section 5 (off)"
+        },
+        "section_desc": {
+            "s1": "Section 1 is the top section of the home page. Choose the widget for each column. With 2 columns the left and right columns sit side by side (1:1) and stack on narrow screens.",
+            "s2": "Section 2 sits below section 1. Choose the widget for each column. With 2 columns the left and right columns sit side by side (1:1) and stack on narrow screens.",
+            "s3": "Section 3 sits below section 2. Choose the widget for each column. With 2 columns the left and right columns sit side by side (1:1) and stack on narrow screens.",
+            "s4": "Section 4 sits below section 3. Choose the widget for each column. With 2 columns the left and right columns sit side by side (1:1) and stack on narrow screens.",
+            "s5": "Section 5 is the bottom section of the home page. Choose the widget for each column. With 2 columns the left and right columns sit side by side (1:1) and stack on narrow screens."
         },
         "tabs": {
             "layout": "Widget Layout",
@@ -46,22 +57,15 @@
             "s5": "Section 5"
         },
         "layout": {
-            "section": "Section",
             "enabled": "On",
             "columns": "Columns",
             "one": "1 column",
-            "two": "2 columns (1:1, stacked on narrow screens)",
-            "excluded_title": "Common excluded boards",
-            "excluded_help": "Boards excluded here are not shown in recent or popular columns (the news ticker is not affected). This only controls visibility, not read permission."
+            "two": "2 columns (1:1, stacked on narrow screens)"
         },
         "col": {
-            "col1": "Left column (the only one with 1 column)",
-            "col2": "Right column (only with 2 columns)",
             "type": "Widget",
             "limit": "Items (1-20)",
             "boards": "Boards",
-            "mode_all": "All boards",
-            "mode_only": "Selected boards only",
             "board_pick_help": "Drag cards between the two areas or use the X / + buttons. Only boards in 'Not included' are left out; new boards are included automatically. This only controls visibility, not read permission.",
             "ticker_board": "Board (one)",
             "ticker_pick": "Choose a board",
@@ -75,7 +79,14 @@
             "title": "Title",
             "title_placeholder": "Empty = default title",
             "icon": "Icon",
-            "default_icon": "(default icon)",
+            "default_icon": "Default icon",
+            "icon_search": "Search icons",
+            "icon_none": "No matching icons.",
+            "icon_help": "The first cell is the default icon for the widget type. Hover over an icon to see its name.",
+            "select_all": "Select all",
+            "select_all_help": "Move every board to 'Included'. With a search term, only the matching boards move.",
+            "select_none": "Deselect all",
+            "select_none_help": "Move every board to 'Not included'. With a search term, only the matching boards move.",
             "html": "HTML",
             "html_help": "HTML only. Scripts, event attributes (onclick, ...) and javascript: links are removed both when saving and when showing."
         },
