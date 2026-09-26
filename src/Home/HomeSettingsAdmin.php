@@ -22,7 +22,7 @@ use Plugins\G7\Home\Widgets\Support\BoardFilterSettings;
 final class HomeSettingsAdmin
 {
     public function __construct(
-        private readonly HomeLayoutSettings $settings,
+        private readonly StoredHomeLayout $stored,
         private readonly BoardService $boards,
         private readonly WidgetRegistry $registry,
     ) {}
@@ -34,10 +34,8 @@ final class HomeSettingsAdmin
      */
     public function form(): array
     {
-        $all = function_exists('plugin_settings') ? plugin_settings(BoardFilterSettings::IDENTIFIER) : [];
-        $raw = is_array($all) ? ($all[HomeLayoutSettings::KEY] ?? null) : null;
-        $settings = $this->settings->withLegacyExcluded(BoardFilterSettings::excludedIds());
-        $layout = $settings->normalize($raw, $this->activeIdBySlug(HomeLayoutService::DEFAULT_TICKER_SLUG));
+        $settings = $this->stored->settings();
+        $layout = $settings->normalize($this->stored->raw(), $this->activeIdBySlug(HomeLayoutService::DEFAULT_TICKER_SLUG));
 
         return HomeLayoutForm::toFlat($layout, $settings->defaultCol('recent'), $this->activeIds());
     }
@@ -87,7 +85,7 @@ final class HomeSettingsAdmin
         }
 
         $settings = HomeLayoutForm::keepLegacyKey($settings);
-        $normalizer = $this->settings->withLegacyExcluded(BoardFilterSettings::excludedIds());
+        $normalizer = $this->stored->settings();
         $layout = $normalizer->normalize(HomeLayoutForm::toStructure($settings[HomeLayoutForm::INPUT_KEY]), null);
         $active = array_fill_keys($this->activeIds(), true);
         foreach ($layout['sections'] as $i => $section) {

@@ -2,8 +2,6 @@
 
 namespace Plugins\G7\Home\Widgets\Home;
 
-use Plugins\G7\Home\Widgets\Support\BoardFilterSettings;
-
 /**
  * 홈 섹션 응답 조립(0.4.0). 브라우저 API 와 봇 컨텍스트 필터가 같은 이 메서드를 부른다.
  *
@@ -21,7 +19,7 @@ final class HomeLayoutService
     public const DEFAULT_TICKER_SLUG = 'notice';
 
     public function __construct(
-        private readonly HomeLayoutSettings $settings,
+        private readonly StoredHomeLayout $stored,
         private readonly WidgetRegistry $registry,
         private readonly BoardPostsSource $source,
     ) {}
@@ -36,8 +34,8 @@ final class HomeLayoutService
         // 공통 제외는 새 섹션에 적용하지 않는다. 옛 excluded_board_ids 는 자기 선택이 없는 목록 위젯의
         // "포함 안 함" 기본값으로만 쓴다(이관, 설정 파일은 고쳐 쓰지 않음).
         $scope = new BoardScope($this->source->readableBoards());
-        $settings = $this->settings->withLegacyExcluded(BoardFilterSettings::excludedIds());
-        $layout = $settings->normalize($this->storedLayout(), $scope->idBySlug(self::DEFAULT_TICKER_SLUG));
+        $settings = $this->stored->settings();
+        $layout = $settings->normalize($this->stored->raw(), $scope->idBySlug(self::DEFAULT_TICKER_SLUG));
 
         $sections = [];
         $fallbacks = [];
@@ -83,15 +81,5 @@ final class HomeLayoutService
             'icon' => $col['icon'] !== '' ? $col['icon'] : $widget->defaultIcon(),
             'empty_text' => __('g7-home-widgets::messages.home.empty.'.$widget->id()),
         ] + $widget->data($col, $widget->boardSelection() === 'none' ? [] : $scope->resolve($col['boards']));
-    }
-
-    /**
-     * 저장된 `home_layout` 원값(없으면 null).
-     */
-    private function storedLayout(): mixed
-    {
-        $all = function_exists('plugin_settings') ? plugin_settings(BoardFilterSettings::IDENTIFIER) : [];
-
-        return is_array($all) ? ($all[HomeLayoutSettings::KEY] ?? null) : null;
     }
 }

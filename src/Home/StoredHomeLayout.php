@@ -1,0 +1,35 @@
+<?php
+
+namespace Plugins\G7\Home\Widgets\Home;
+
+use Plugins\G7\Home\Widgets\Support\BoardFilterSettings;
+
+/**
+ * 저장된 홈 섹션 설정을 읽는 한 곳(0.4.0 릴리스 전 구조 정리).
+ *
+ * 홈 조립({@see HomeLayoutService})과 관리자 화면({@see HomeSettingsAdmin})이 같은 두 가지를 각자 읽고
+ * 있었다 — 플러그인 설정의 `home_layout` 원값, 옛 `excluded_board_ids` 를 목록 위젯 기본값으로 쓰는 정리기.
+ * 읽는 곳을 여기 하나로 모았다. 동작은 전과 같다(코어 설정 헬퍼를 그대로 부른다).
+ */
+final class StoredHomeLayout
+{
+    public function __construct(private readonly HomeLayoutSettings $settings) {}
+
+    /**
+     * 저장된 `home_layout` 원값(없으면 null). 정리는 하지 않는다.
+     */
+    public function raw(): mixed
+    {
+        $all = function_exists('plugin_settings') ? plugin_settings(BoardFilterSettings::IDENTIFIER) : [];
+
+        return is_array($all) ? ($all[HomeLayoutSettings::KEY] ?? null) : null;
+    }
+
+    /**
+     * 옛 `excluded_board_ids` 를 자기 선택 없는 목록 위젯의 "포함 안 함" 기본값으로 쓰는 정리기(이관, 파일은 고치지 않음).
+     */
+    public function settings(): HomeLayoutSettings
+    {
+        return $this->settings->withLegacyExcluded(BoardFilterSettings::excludedIds());
+    }
+}
