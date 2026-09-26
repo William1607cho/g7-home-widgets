@@ -68,7 +68,8 @@ g7-webzine-addon 1.3.0+ only for the optional webzine-style widget.
   fallback image when the add-on has one set, otherwise the gallery's empty frame.
   - Add-on presence = the core reports the plugin active **and** the contract class exists with
     `VERSION >= 1`; checked once per request, so turning the add-on on or off shows on the next
-    request.
+    request. Turning g7-webzine-addon on or off also clears the widget data cache and the cached
+    bot home page (the core clears the SEO cache on activation only).
   - Without the add-on (not installed, turned off, or a version without the contract) the type is
     a disabled choice labelled "(add-on required)". A column whose type is webzine also shows a
     small preview image (`resources/assets/webzine-preview.webp`, bundled, no external request —
