@@ -13,6 +13,7 @@ use Plugins\G7\Home\Widgets\Home\Widgets\PopularWidget;
 use Plugins\G7\Home\Widgets\Home\Widgets\RecentWidget;
 use Plugins\G7\Home\Widgets\Home\Widgets\TickerWidget;
 use Plugins\G7\Home\Widgets\Home\Widgets\WebzineWidget;
+use Plugins\G7\Home\Widgets\Home\ImageDelivery;
 use Plugins\G7\Home\Widgets\Home\WebzineAddon;
 
 /**
@@ -46,6 +47,8 @@ class HomeWidgetsServiceProvider extends BasePluginServiceProvider
         $this->app->singleton(WidgetCache::class);
         // 웹진 애드온 유무 판정은 요청 단위로만 기억한다(활성·비활성 직후 다음 요청에 반영).
         $this->app->scoped(WebzineAddon::class);
+        // image-delivery 유무 판정도 같은 이유로 요청 단위(0.4.2).
+        $this->app->scoped(ImageDelivery::class);
         $this->app->singleton(WidgetRegistry::class, fn ($app) => new WidgetRegistry(
             array_map(fn (string $class) => $app->make($class), self::WIDGETS)
         ));

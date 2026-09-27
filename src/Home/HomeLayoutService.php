@@ -22,6 +22,7 @@ final class HomeLayoutService
         private readonly StoredHomeLayout $stored,
         private readonly WidgetRegistry $registry,
         private readonly BoardPostsSource $source,
+        private readonly ImageDelivery $images,
     ) {}
 
     /**
@@ -62,6 +63,10 @@ final class HomeLayoutService
                 $sections[] = ['key' => $sKey, 'row_class' => 'g7hw-section g7hw-cols-'.$section['columns'], 'cols' => $cols];
             }
         }
+
+        // 갤러리·웹진 썸네일 → image-delivery 변환본(0.4.2). 모든 칸을 모아 계약을 한 번만 부른다.
+        // 위젯 목록 캐시 뒤에서 하므로 변환본이 생기면 다음 요청부터 바로 쓰인다.
+        $sections = ThumbnailVariants::apply($sections, $this->images->lookup(ThumbnailVariants::urls($sections)));
 
         return ['has_sections' => $sections !== [], 'sections' => $sections, 'fallbacks' => $fallbacks];
     }

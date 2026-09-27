@@ -13,7 +13,8 @@ use Modules\Sirsoft\Board\Services\PostService;
  * 코어 사용자 목록 화면(`User\PostController::index`)과 같은 순서로 부른다:
  * `PostService::buildListParams()` → `PostService::getPosts(…, 'user', $board)` → board 관계 주입 →
  * `PostResource`. 썸네일은 `PostResource` 의 `thumbnail`(첨부 이미지 우선, 없으면 본문 첫 내부 이미지,
- * 볼 권한 없는 비밀글은 null)을 그대로 쓴다. 이미지 변환본(image-delivery)은 쓰지 않는다.
+ * 볼 권한 없는 비밀글은 null)을 그대로 쓴다. image-delivery 변환본으로 바꾸는 것은 캐시 뒤에서
+ * {@see HomeLayoutService} 가 한다(0.4.2, {@see ThumbnailVariants}) — 이 목록(캐시 대상)에는 원래 주소를 둔다.
  *
  * 추가로 하는 것:
  * - 답글(parent_id 있음)과 발행 상태가 아닌 글은 뺀다(홈 최근글과 같은 기준).

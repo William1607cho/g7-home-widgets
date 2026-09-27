@@ -2,7 +2,7 @@
     "name": "plugins/g7-home-widgets",
     "description": "Home page widgets for Gnuboard7 — a site-wide recent-posts feed queried directly against sirsoft-board's core models, without modifying sirsoft-board.",
     "type": "library",
-    "version": "0.4.1",
+    "version": "0.4.2",
     "license": "MIT",
     "authors": [
         {

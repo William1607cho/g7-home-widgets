@@ -431,8 +431,11 @@
     color: var(--g7hw-text);
 }
 
-.g7hw-wz-link:hover .g7hw-wz-title {
-    color: var(--g7hw-accent);
+/* 롤오버 제목 색(0.4.2) — 게시판 이름과 같은 주황 토큰. 마우스·키보드 포커스·터치 모두 같게 */
+.g7hw-wz-link:hover .g7hw-wz-title,
+.g7hw-wz-link:focus-visible .g7hw-wz-title,
+.g7hw-wz-link:active .g7hw-wz-title {
+    color: var(--g7hw-board);
 }
 
 .g7hw-wz-summary {

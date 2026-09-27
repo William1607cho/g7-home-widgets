@@ -5,6 +5,37 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.2] - Unreleased
+
+### Changed
+
+- **Gallery and webzine widget thumbnails now use resized variants** from
+  [g7-image-delivery](https://github.com/William1607cho/g7-image-delivery) 0.3.0+ instead of the
+  original upload. Until now these widgets loaded the full original (on staging, 2000×1125 files
+  of 1.0–1.2 MB drawn in a 186×139 or 80×80 box) while the board lists already showed a 240px
+  WebP. The widgets now ask g7-image-delivery's public contract (`ThumbnailVariants::lookup`) once
+  per response for every thumbnail on the page — not per column or per post — and use the 240
+  variant as `src`, with 240 and 960 in `srcset` and a `sizes` value matching each widget's box,
+  so high-density screens pick the 960 one. When an original is 960px or narrower (no 960
+  variant), a JPEG or WebP original is added to `srcset` at its own width so high-density screens
+  are not left with a stretched 240. The bot (server-rendered) home uses the same data, so its
+  `src` is the 240 variant too.
+- A post whose variants are not built yet (g7-image-delivery builds them every 10 minutes), or any
+  site without g7-image-delivery 0.3.0 (not installed, inactive, or an older version without the
+  contract), keeps the original address exactly as in 0.4.1 — the same thing board lists do. The
+  lookup runs after the widget list cache, so variants show up on the next request once built.
+  g7-image-delivery is not a required dependency.
+- **Webzine widget hover colour**: the post title turned blue on hover; it now turns the same
+  orange as the board name (`--color-primary-600`, dark mode `--color-primary-400`, same fallbacks
+  as 0.4.1), and the same colour applies on keyboard focus (`:focus-visible`) and while tapped
+  (`:active`). Nothing else about the widget changes; other widgets' hover styles are unchanged.
+
+### Unchanged
+
+- Secret posts still show a lock and never send an image address to the lookup; the webzine
+  add-on's fallback image, the recent-posts stand-in when the add-on is missing, and the layout of
+  every widget are as before.
+
 ## [0.4.1] - 2026-09-26
 
 ### Changed

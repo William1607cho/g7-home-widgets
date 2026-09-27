@@ -86,6 +86,8 @@
                                             "name": "Img",
                                             "props": {
                                                 "src": "{{item.thumbnail}}",
+                                                "srcSet": "{{item.thumbnail_srcset}}",
+                                                "sizes": "(max-width: 639px) 64px, 80px",
                                                 "alt": "",
                                                 "loading": "lazy",
                                                 "className": "g7hw-thumb-img"
