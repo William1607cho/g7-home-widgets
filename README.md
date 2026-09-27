@@ -107,8 +107,8 @@
 - **공통 제외 설정 `excluded_board_ids` 는 더 이상 읽지 않습니다.** 설정 파일에 저장된 값은 지우지 않고 그대로
   두며(되돌릴 때 그대로 쓰입니다), 설정 화면·설정 저장 API 도 이 키를 받지 않습니다(요청에 섞여 와도 무시).
 - **저장 안 된 칸의 기본값**: 0.4.x 에서는 게시판 선택을 저장하지 않은 목록 위젯 칸이 공통 제외 목록을 "포함 안
-  함" 기본값으로 썼습니다. 0.5.0 에서는 그런 칸이 **모든 게시판을 포함**합니다. 홈 화면 설정을 한 번이라도
-  저장했다면 보이는 칸은 모두 자기 선택을 갖고 있어 바뀌지 않습니다. 나중에 1단 섹션을 2단으로 바꾸면 새 칸은
+  함" 기본값으로 썼습니다. 0.5.0 에서는 그런 칸이 **모든 게시판을 포함**합니다. 홈 화면 설정 화면에서
+  저장한 칸은 대부분 자기 선택을 갖고 있어 달라지지 않지만, 아래 "확인 방법"으로 확인하세요. 나중에 1단 섹션을 2단으로 바꾸면 새 칸은
   "모두 포함"으로 열리므로, 빼고 싶은 게시판을 그 칸에서 직접 고르세요.
 - 확인 방법: 설정 파일(`storage/app/plugins/g7-home-widgets/settings/setting.json`)의 `home_layout` 에서 보이는
   칸마다 `boards` 가 있는지 보면 됩니다. 없거나 `null` 인 칸은 0.5.0 에서 모든 게시판을 보여 줍니다.
@@ -176,7 +176,8 @@ A Gnuboard7 plugin for home pages built on `sirsoft-board`.
 - **0.5.0 removes legacy parts**: the `recent-posts`, `popular-posts` and `notice-posts` APIs and the
   `admin/board-filter` API now return 404, and the `excluded_board_ids` setting is no longer read (the
   stored value is left untouched, so rolling back to 0.4.2 restores the old behaviour). A column with
-  no saved board choice now includes every board; columns you have saved keep their own choice.
+  no saved board choice now includes every board; columns saved on the Home Page Settings screen
+  usually keep their own choice — check `boards` in `home_layout` before updating.
 - **Updating**: 0.4.x → 0.5.0 needs one `plugin:update` (hook listeners are unchanged). Earlier
   upgrades that added listeners needed a second run with the same package.
 - **Rolling back to 0.3.0** removes the sections; the home overlay row stays, so each home visit makes
