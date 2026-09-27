@@ -6,7 +6,7 @@ use PHPUnit\Framework\TestCase;
 use Plugins\G7\Home\Widgets\Home\BoardScope;
 
 /**
- * 칸 게시판 집합 = 열람 가능 ∩ 선택 − 공통 제외 (0.4.0) — 순수 클래스.
+ * 칸 게시판 집합 = 열람 가능 ∩ 그 칸의 선택 (0.4.0, 0.5.0 공통 제외 없음) — 순수 클래스.
  */
 class BoardScopeTest extends TestCase
 {

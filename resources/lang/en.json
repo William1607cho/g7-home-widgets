@@ -1,8 +1,6 @@
 {
     "settings": {
-        "notice": "This only controls visibility and does not change read permissions. The notice ticker is not affected.",
         "filter_placeholder": "Filter by board name or slug",
-        "excluded_title": "Not included",
         "exclude": "Hide from widgets",
         "include": "Show in widgets",
         "save_success": "Saved.",

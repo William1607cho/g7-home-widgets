@@ -72,20 +72,6 @@ final class HomeLayoutForm
     }
 
     /**
-     * 새 화면 저장에서는 옛 공통 제외 키(`excluded_board_ids`)를 요청에서 뺀다 — 코어 저장이 기존 파일 값과
-     * 병합하므로 이 키는 파일에 있던 값 그대로 남는다(옛 위젯 API 3종이 계속 쓴다).
-     *
-     * @param  array<string, mixed>  $settings
-     * @return array<string, mixed>
-     */
-    public static function keepLegacyKey(array $settings): array
-    {
-        unset($settings['excluded_board_ids']);
-
-        return $settings;
-    }
-
-    /**
      * 게시판 선택 → 포함 안 함 목록. `exclude` 는 그대로, `only` 는 활성 게시판 − 고른 목록, `all` 은 빈 목록.
      *
      * @param  array<string, mixed>  $boards

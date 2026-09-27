@@ -11,7 +11,7 @@ namespace Plugins\G7\Home\Widgets\Home;
  * 404 fallback 등) 아무것도 그리지 않는다.
  *
  * 권한: 호출자 기준 열람 가능 게시판은 코어가 정하고({@see BoardPostsSource::readableBoards()}),
- * 칸마다 {@see BoardScope} 로 선택·공통 제외를 적용한다.
+ * 칸마다 {@see BoardScope} 로 그 칸의 게시판 선택을 적용한다.
  */
 final class HomeLayoutService
 {
@@ -32,8 +32,7 @@ final class HomeLayoutService
      */
     public function build(): array
     {
-        // 공통 제외는 새 섹션에 적용하지 않는다. 옛 excluded_board_ids 는 자기 선택이 없는 목록 위젯의
-        // "포함 안 함" 기본값으로만 쓴다(이관, 설정 파일은 고쳐 쓰지 않음).
+        // 게시판 선택은 칸마다 따로 적용한다. 자기 선택이 없는 목록 위젯은 모든 게시판을 포함한다(0.5.0).
         $scope = new BoardScope($this->source->readableBoards());
         $settings = $this->stored->settings();
         $layout = $settings->normalize($this->stored->raw(), $scope->idBySlug(self::DEFAULT_TICKER_SLUG));

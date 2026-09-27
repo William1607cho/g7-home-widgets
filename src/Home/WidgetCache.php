@@ -20,7 +20,7 @@ use Illuminate\Support\Facades\Cache;
  */
 final class WidgetCache
 {
-    /** 데이터 TTL(초) — 0.3.0 위젯 API 와 같다 */
+    /** 데이터 TTL(초) */
     public const TTL_SECONDS = 90;
 
     /** 세대 번호 키 */

@@ -16,7 +16,7 @@ use Plugins\G7\Home\Widgets\Home\PostLists;
  */
 final class TickerWidget implements HomeWidget
 {
-    /** 응답에 싣는 항목 키(0.3.0 notice-posts 응답과 같은 칸) */
+    /** 응답에 싣는 항목 키(0.3.0 공지 티커와 같은 칸) */
     public const ITEM_KEYS = ['id', 'board_slug', 'title', 'created_at', 'created_at_formatted'];
 
     public function __construct(private readonly BoardPostsSource $source) {}
@@ -67,7 +67,7 @@ final class TickerWidget implements HomeWidget
     }
 
     /**
-     * 게시판 1개(공통 제외와 무관 — 확정 사항). 열람 가능 판정은
+     * 게시판 1개(확정 사항). 열람 가능 판정은
      * {@see \Plugins\G7\Home\Widgets\Home\BoardScope} 가 그대로 적용한다.
      */
     public function boardSelection(): string

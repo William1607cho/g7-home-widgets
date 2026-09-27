@@ -151,15 +151,15 @@ class HomeLayoutSettingsTest extends TestCase
         $this->assertSame(['mode' => 'only', 'ids' => []], $out['sections'][0]['cols'][0]['boards']);
     }
 
-    public function test_legacy_excluded_ids_are_the_default_for_list_widgets_only(): void
+    public function test_list_widgets_without_their_own_choice_include_every_board(): void
     {
-        $s = $this->settings()->withLegacyExcluded([47, 33, 46, 34]);
+        $s = $this->settings();
         $d = $s->defaults(46);
 
-        $this->assertSame(['mode' => 'exclude', 'ids' => [33, 34, 46, 47]], $d['sections'][0]['cols'][0]['boards']);
-        $this->assertSame(['mode' => 'exclude', 'ids' => [33, 34, 46, 47]], $d['sections'][0]['cols'][1]['boards']);
-        // 티커는 공통 제외와 무관 — 공지(46)가 제외 목록에 있어도 그대로
+        $this->assertSame(['mode' => 'exclude', 'ids' => []], $d['sections'][0]['cols'][0]['boards']);
+        $this->assertSame(['mode' => 'exclude', 'ids' => []], $d['sections'][0]['cols'][1]['boards']);
         $this->assertSame(['mode' => 'only', 'ids' => [46]], $d['sections'][1]['cols'][0]['boards']);
+        $this->assertSame(['mode' => 'exclude', 'ids' => []], $s->defaultCol('popular')['boards']);
         // 자기 선택이 저장된 칸은 그 값을 쓴다
         $saved = $s->normalize(['sections' => [['enabled' => true, 'columns' => 1,
             'cols' => [['type' => 'recent', 'boards' => ['mode' => 'exclude', 'ids' => [5]]]]]]], 46);

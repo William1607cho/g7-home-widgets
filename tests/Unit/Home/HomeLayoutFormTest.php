@@ -80,12 +80,21 @@ class HomeLayoutFormTest extends TestCase
         $this->assertSame(1 + 5 * 2 + 10 * 10, count($rules));
     }
 
-    public function test_new_form_save_never_carries_the_legacy_key(): void
+    public function test_unsaved_list_columns_open_with_every_board_included(): void
     {
-        $out = HomeLayoutForm::keepLegacyKey(['home_layout_form' => [], 'excluded_board_ids' => [1, 2]]);
+        $s = $this->settings();
+        // 1번 섹션 첫 칸은 게시판 선택 없이 저장된 최근글, 2번 섹션은 1단(두 번째 칸 없음), 3~5번은 저장 안 됨
+        $layout = $s->normalize(['sections' => [
+            ['enabled' => true, 'columns' => 1, 'cols' => [['type' => 'recent', 'limit' => 7]]],
+            ['enabled' => true, 'columns' => 1, 'cols' => [['type' => 'ticker', 'boards' => ['mode' => 'only', 'ids' => [4]]]]],
+        ]], 4);
+        $flat = HomeLayoutForm::toFlat($layout, $s->defaultCol('recent'), [1, 4, 9]);
 
-        $this->assertArrayNotHasKey('excluded_board_ids', $out);
-        $this->assertArrayHasKey('home_layout_form', $out);
+        foreach (['s1c1', 's1c2', 's2c2', 's3c1', 's5c1'] as $k) {
+            $this->assertSame('exclude', $flat[$k.'_mode'], $k);
+            $this->assertSame([], $flat[$k.'_ids'], $k);
+        }
+        $this->assertSame(4, $flat['s2c1_board']);
     }
 
     public function test_board_choices_become_exclude_lists(): void

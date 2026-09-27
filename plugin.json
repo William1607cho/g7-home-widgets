@@ -5,11 +5,11 @@
         "ko": "홈 화면 위젯 모음",
         "en": "Home Page Widgets"
     },
-    "version": "0.4.2",
+    "version": "0.5.0",
     "license": "MIT",
     "description": {
-        "ko": "홈 화면에 섹션 5개(켜기/끄기, 1단·2단)를 그리고 칸마다 최근글·인기글·뉴스 티커·갤러리·웹진 스타일(g7-webzine-addon 1.3.0 이상)·HTML 위젯을 고르는 플러그인입니다. 관리자 → 홈 화면 설정에서 정합니다. 템플릿 홈 위젯이 쓰는 전체 최근글·인기글·공지 티커 API 도 그대로 제공합니다. sirsoft-board 와 템플릿 파일은 수정하지 않으며, 글 목록·열람 권한·비밀글 판정은 sirsoft-board 에 맡깁니다.",
-        "en": "Draws five home-page sections (each on/off, one or two columns) and lets you pick a widget for each column: recent posts, popular posts, news ticker, gallery, webzine style (needs g7-webzine-addon 1.3.0+) or HTML — set in Admin → Home Page Settings. Still provides the recent, popular and notice-ticker APIs used by template home widgets. sirsoft-board and template files are not modified; post lists, read permission and secret posts are left to sirsoft-board."
+        "ko": "홈 화면에 섹션 5개(켜기/끄기, 1단·2단)를 그리고 칸마다 최근글·인기글·뉴스 티커·갤러리·웹진 스타일(g7-webzine-addon 1.3.0 이상)·HTML 위젯을 고르는 플러그인입니다. 관리자 → 홈 화면 설정에서 정합니다. sirsoft-board 와 템플릿 파일은 수정하지 않으며, 글 목록·열람 권한·비밀글 판정은 sirsoft-board 에 맡깁니다.",
+        "en": "Draws five home-page sections (each on/off, one or two columns) and lets you pick a widget for each column: recent posts, popular posts, news ticker, gallery, webzine style (needs g7-webzine-addon 1.3.0+) or HTML — set in Admin → Home Page Settings. sirsoft-board and template files are not modified; post lists, read permission and secret posts are left to sirsoft-board."
     },
     "g7_version": ">=7.0.10",
     "dependencies": {

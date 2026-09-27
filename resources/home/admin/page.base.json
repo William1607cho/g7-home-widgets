@@ -300,13 +300,5 @@
                 ]
             }
         ]
-    },
-    "schema": {
-        "excluded_board_ids": {
-            "type": "array",
-            "default": [],
-            "label": "$t:g7-home-widgets.settings.excluded_title",
-            "hint": "$t:g7-home-widgets.settings.notice"
-        }
     }
 }

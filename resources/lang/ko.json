@@ -1,8 +1,6 @@
 {
     "settings": {
-        "notice": "표시 여부만 정하며, 열람 권한과는 무관합니다. 공지 티커는 이 설정의 영향을 받지 않습니다.",
         "filter_placeholder": "게시판 이름이나 슬러그로 찾기",
-        "excluded_title": "포함안함",
         "exclude": "위젯에서 제외",
         "include": "위젯에 포함",
         "save_success": "저장했습니다.",

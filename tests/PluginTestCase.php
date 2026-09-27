@@ -17,11 +17,10 @@ use Plugins\G7\Home\Widgets\Support\BoardFilterSettings;
 use Tests\TestCase;
 
 /**
- * g7-home-widgets 테스트 베이스 클래스 (0.3.0)
+ * g7-home-widgets 테스트 베이스 클래스 (0.3.0, DB 가 필요한 테스트용)
  *
  * - 데이터 정리는 DatabaseTransactions 롤백으로만 한다. 기존 행을 DELETE/TRUNCATE 하지 않는다.
- * - 제외 설정은 플러그인 설정 파일에 저장되므로 롤백되지 않는다 — 각 테스트 앞뒤로 원래 값을
- *   되돌린다.
+ * - 0.5.0: 옛 공통 제외 설정을 저장·복원하던 도우미를 뺐다(그 설정을 쓰던 테스트와 함께).
  * - 이 플러그인은 번들(`plugins/_bundled`)이 아니므로 코어 phpunit 스위트에 자동 포함되지 않는다.
  *   실행할 때는 테스트 전용 DB·스토리지에서 경로를 직접 지정한다.
  */
@@ -30,9 +29,6 @@ abstract class PluginTestCase extends TestCase
     use DatabaseTransactions;
 
     protected static bool $migrated = false;
-
-    /** 테스트 시작 시점의 제외 목록 (복원용) */
-    private array $originalExcluded = [];
 
     protected function setUp(): void
     {
@@ -45,19 +41,7 @@ abstract class PluginTestCase extends TestCase
             $this->markTestSkipped('g7-home-widgets 가 설치된 테스트 환경에서만 실행한다.');
         }
 
-        $this->originalExcluded = BoardFilterSettings::excludedIds();
-        $this->setExcluded([]);
-
         PermissionMiddleware::clearGuestRoleCache();
-    }
-
-    protected function tearDown(): void
-    {
-        if (app()->bound(PluginManager::class) && app(PluginManager::class)->getPlugin(BoardFilterSettings::IDENTIFIER)) {
-            $this->setExcluded($this->originalExcluded);
-        }
-
-        parent::tearDown();
     }
 
     protected function getPluginBasePath(): string
@@ -104,19 +88,6 @@ abstract class PluginTestCase extends TestCase
         }
 
         static::$migrated = true;
-    }
-
-    /**
-     * 제외 목록을 저장하고 위젯 풀 캐시를 비운다.
-     *
-     * @param  array<int, int>  $ids
-     */
-    protected function setExcluded(array $ids): void
-    {
-        $before = BoardFilterSettings::fingerprint(BoardFilterSettings::excludedIds());
-        BoardFilterSettings::save($ids);
-        BoardFilterSettings::forgetPoolsFor($before);
-        BoardFilterSettings::forgetPoolsFor(BoardFilterSettings::fingerprint(BoardFilterSettings::normalize($ids)));
     }
 
     /**

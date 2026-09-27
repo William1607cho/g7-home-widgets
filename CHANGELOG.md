@@ -5,6 +5,37 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased] - 0.5.0
+
+### Removed
+
+- **Legacy widget APIs** kept since 0.1.0–0.3.0 for template home widgets. They now return 404:
+  - `GET /api/plugins/g7-home-widgets/recent-posts`
+  - `GET /api/plugins/g7-home-widgets/popular-posts`
+  - `GET /api/plugins/g7-home-widgets/notice-posts`
+
+  The home sections (`GET /api/plugins/g7-home-widgets/home`) cover the same lists, and
+  `g7-wc-community` has not called these addresses since fork-20260926. Remove any template or
+  extension data source that still calls them before updating.
+- **Board filter admin API** `GET` / `PUT /api/plugins/g7-home-widgets/admin/board-filter`. The
+  0.4.0 Home Page Settings screen already did not use it.
+- **The `excluded_board_ids` setting.** excluded_board_ids is no longer read; the stored value is
+  left untouched. It is gone from the settings schema and defaults, so the core settings API ignores
+  it in requests, and the file keeps whatever value it had (rolling back to 0.4.2 reads it again).
+- The description-only `schema` block of the admin settings layout and its two translation keys
+  (`settings.notice`, `settings.excluded_title`), and the `board_filter.*` API messages.
+
+### Changed
+
+- **A list-widget column with no saved board choice now includes every board.** In 0.4.x such a
+  column used the `excluded_board_ids` list as its "not included" default. Columns that have been
+  saved on the Home Page Settings screen keep their own list and are not affected. When a one-column
+  section is switched to two columns, the new column opens with every board included.
+- `config/settings/defaults.json` keeps a non-empty `frontend_schema` (`home_layout` not exposed), so
+  no setting of this plugin is added to the visitor-side global settings.
+- Updating from 0.4.x needs a single `plugin:update`: hook listeners and their subscribed hooks are
+  unchanged.
+
 ## [0.4.2] - 2026-09-27
 
 ### Changed

@@ -14,8 +14,8 @@ namespace Plugins\G7\Home\Widgets\Home;
  * - 읽을 때마다 정리한다. 코어 경로 밖에서 파일이 바뀌어도 화면이 깨지지 않게 하려는 것이다.
  *   알 수 없는 값은 버리지 않고 그 칸의 기본값으로 되돌린다.
  * - 게시판 선택(보완 묶음): 목록 위젯(`boardSelection() === 'many'`)은 `exclude`(포함 안 함 목록)로 저장한다.
- *   자기 선택이 저장돼 있지 않은 목록 위젯의 기본값 = 옛 공통 제외 목록 `excluded_board_ids`
- *   ({@see self::withLegacyExcluded()}). 설정 파일은 고쳐 쓰지 않는다(읽을 때 기본값으로만).
+ *   자기 선택이 저장돼 있지 않은 목록 위젯(키 없음·null·배열 아님)의 기본값은 빈 포함 안 함 목록 —
+ *   모든 게시판 포함이다(0.5.0: 0.4.x 의 옛 공통 제외 목록은 더 이상 기본값으로 쓰지 않는다).
  */
 final class HomeLayoutSettings
 {
@@ -30,9 +30,6 @@ final class HomeLayoutSettings
 
     /** 게시판 선택 방식(all·only 는 옛 저장값 호환) */
     public const MODES = ['all', 'only', 'exclude'];
-
-    /** @var array<int, int> 이관 기본값 — 목록 위젯의 포함 안 함 기본 목록 */
-    private array $legacyExcluded = [];
 
     /** 칸 하나가 고를 수 있는 게시판 수 상한 */
     public const MAX_BOARD_IDS = 500;
@@ -49,19 +46,6 @@ final class HomeLayoutSettings
     public function __construct(private readonly WidgetRegistry $registry, array $icons = [])
     {
         $this->icons = array_fill_keys($icons, true);
-    }
-
-    /**
-     * 목록 위젯의 기본 "포함 안 함" 목록을 정한 사본(이관 기본값 = 옛 `excluded_board_ids`).
-     *
-     * @param  array<int, int>  $ids
-     */
-    public function withLegacyExcluded(array $ids): self
-    {
-        $copy = clone $this;
-        $copy->legacyExcluded = self::normalizeIds($ids);
-
-        return $copy;
     }
 
     /**
@@ -170,12 +154,8 @@ final class HomeLayoutSettings
     public function defaultCol(string $type): array
     {
         $widget = $this->registry->get($type);
-        $col = ['type' => $type, 'title' => '', 'icon' => ''] + $widget->defaults();
-        if ($widget->boardSelection() === 'many') {
-            $col['boards'] = ['mode' => 'exclude', 'ids' => $this->legacyExcluded];
-        }
 
-        return $col;
+        return ['type' => $type, 'title' => '', 'icon' => ''] + $widget->defaults();
     }
 
     /**

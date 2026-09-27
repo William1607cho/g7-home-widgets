@@ -4,10 +4,10 @@
 
 [그누보드7](https://sir.kr/) `sirsoft-board` 게시판을 쓰는 사이트의 **홈 화면 위젯 모음** 플러그인입니다.
 
-- **0.4.0 홈 섹션**: 홈 화면에 섹션 5개(섹션마다 켜기/끄기, 1단·2단)를 그리고, 칸마다 최근글·인기글·
+- **홈 섹션**: 홈 화면에 섹션 5개(섹션마다 켜기/끄기, 1단·2단)를 그리고, 칸마다 최근글·인기글·
   뉴스 티커·갤러리·웹진 스타일·HTML 위젯을 고릅니다. 관리자 화면 **홈 화면 설정**에서 정합니다.
-- **옛 위젯 API 3종**(0.1.0~0.3.0): 템플릿 위젯이 쓰는 전체 최근글·인기글·공지 티커 JSON 데이터 소스.
-  0.4.0 에서도 그대로 남아 있습니다.
+- 0.5.0 에서 0.4.x 까지 남아 있던 옛 위젯 API 와 공통 제외 설정을 뺐습니다. 업데이트 전에 아래
+  "0.5.0 변경 안내"를 확인하세요.
 
 `sirsoft-board`·템플릿 파일은 수정하지 않습니다. 홈 섹션은 레이아웃 확장(overlay)으로 홈 화면에
 주입하고, 글 목록·열람 권한·비밀글 판정은 `sirsoft-board` 코어 서비스에 맡깁니다.
@@ -33,7 +33,7 @@
   분류를 빼고 게시판 이름만 보여 줍니다.
 - **게시판 선택은 위젯마다** 따로 합니다. 보여 주는 게시판 = 보는 사람이 읽을 수 있는 게시판(코어 판정)에서
   위젯의 "포함 안 함" 목록을 뺀 것(최근글·인기글·갤러리·웹진) 또는 고른 게시판 1개(티커). 새로 만든 게시판은
-  자동으로 포함됩니다. 인기글은 코어 인기글 캐시에서 고르므로 게시판을 좁게 고르면 설정 개수보다 적게 나올 수
+  자동으로 포함됩니다. 게시판 선택을 저장하지 않은 칸은 모든 게시판을 포함합니다. 인기글은 코어 인기글 캐시에서 고르므로 게시판을 좁게 고르면 설정 개수보다 적게 나올 수
   있습니다.
 - 검색엔진 봇 화면에도 같은 데이터가 서버에서 그려집니다(`core.seo.filter_context`, 티커는 정적 목록).
 - 데이터는 `GET /api/plugins/g7-home-widgets/home` 한 번으로 받습니다(공개, `optional.sanctum`).
@@ -54,7 +54,7 @@
   - **표시 여부만 정하며 열람 권한과는 무관합니다.** 권한은 요청마다 코어가 판정합니다.
 - 저장은 코어 플러그인 설정 저장 경로를 씁니다. 플러그인은 검증 규칙(개수 1~20, 티커 게시판 1개)을 더하고
   폼을 `home_layout` 으로 바꿔 저장하며, 저장 뒤 위젯 데이터 캐시와 봇 홈 캐시를 비웁니다.
-  **`excluded_board_ids` 는 이 화면이 건드리지 않습니다.**
+- 새로 여는 칸(1단 섹션을 2단으로 바꿀 때 생기는 칸 포함)은 게시판이 모두 "포함"인 상태로 열립니다.
 - 읽기 API: `GET admin/home-form`, `GET admin/home-meta` (`core.plugins.read`).
 
 ## 웹진 애드온 연동 (g7-webzine-addon)
@@ -91,33 +91,27 @@
 - 봇 화면도 같은 데이터를 쓰므로 `src` 가 240 변환본입니다. 템플릿의 봇 렌더 허용 속성에 `srcset`·`sizes` 가
   없어 봇 HTML 에는 `src` 만 나갑니다.
 
-## 옛 위젯 API 3종 (0.1.0~0.3.0, 그대로 유지)
+## 0.5.0 변경 안내 (다른 사이트 운영자용)
 
-템플릿(예: `g7-wc-community`)의 홈 위젯이 직접 부르는 JSON 데이터 소스입니다. 0.4.0 에서도 주소·응답이 같습니다.
+0.4.x 까지 남겨 두었던 옛 기능을 뺐습니다. 홈 섹션(`GET /api/plugins/g7-home-widgets/home`)의 응답과
+관리자 화면은 아래 "저장 안 된 칸" 한 가지 외에는 그대로입니다.
 
-- **전체 최근글** — `GET /api/plugins/g7-home-widgets/recent-posts?limit=10`
-  - 모든 활성 게시판 글을 `created_at` 순으로 합칩니다(게시판별 `UNION ALL`, 코어 인덱스
-    `idx_board_posts_board_status_created` 재사용).
-  - 필드: `id`, `board_slug`, `board_name`, `title`, `category`, `author_name`, `created_at`,
-    `created_at_formatted`, `view_count`, `comment_count`, `is_secret`, `is_new`. `limit` 기본 10, 최대 20.
-- **인기글** — `GET /api/plugins/g7-home-widgets/popular-posts?period=week&limit=10`
-  - 코어 `boards/popular` 와 같은 필터·정렬(활성 게시판, 발행, 미삭제, 답글 아님, 비밀글 아님, 기간 안;
-    조회수 → 댓글 수 내림차순).
-  - `period`: `today` | `week` | `month` | `year`(기본 `week`, 그 밖은 `year`). `limit` 기본 10, 최대 50.
-  - 필드: `id`, `board_slug`, `board_name`, `title`, `category`, `view_count`, `comment_count`,
-    `created_at`, `created_at_formatted`. **작성자 필드는 조회하지 않습니다.**
-- **공지 티커**(0.2.0+) — `GET /api/plugins/g7-home-widgets/notice-posts?board=notice&limit=5`
-  - 게시판 1곳의 최신글(활성, 발행, 미삭제, 답글 아님, **비밀글 아님**). `board` 필수, `limit` 기본 5, 최대 10.
-  - 필드: `id`, `board_slug`, `title`, `created_at`, `created_at_formatted`. 게시판 없음·잘못된 slug·권한
-    없음은 `data: []`(오류 아님).
-- **공통 제외 목록** `excluded_board_ids`(0.3.0+): 전체 최근글·인기글에서 뺄 게시판 ID 목록입니다(공지 티커는
-  영향 없음). 0.4.0 설정 화면은 이 값을 바꾸지 않습니다. 바꿀 때는 관리자 API
-  `GET` / `PUT /api/plugins/g7-home-widgets/admin/board-filter`(`core.plugins.read` / `core.plugins.update`,
-  본문 `{ "excluded_board_ids": [1, 2] }`)를 씁니다. 홈 섹션의 목록 위젯은 자기 선택을 저장하기 전까지
-  이 목록을 "포함 안 함" 기본값으로 씁니다(설정 파일은 고쳐 쓰지 않음).
-- **권한 안전 캐시**: 사용자와 무관한 "안전 풀"을 90초 캐시하고, 게시판 읽기 권한
-  (`sirsoft-board.{slug}.posts.read`)은 요청마다 현재 사용자로 판정합니다. 풀은 `limit` 보다 커서(최소 50)
-  권한으로 거른 뒤에도 목록이 찹니다. 제외 목록이 바뀌면 이전 목록으로 캐시한 풀을 비웁니다.
+- **없어진 API**(모두 404 가 됩니다)
+  - `GET /api/plugins/g7-home-widgets/recent-posts`
+  - `GET /api/plugins/g7-home-widgets/popular-posts`
+  - `GET /api/plugins/g7-home-widgets/notice-posts`
+  - `GET` · `PUT /api/plugins/g7-home-widgets/admin/board-filter`
+
+  템플릿이나 다른 확장이 이 주소를 데이터 소스로 부르고 있으면 업데이트 전에 지우세요. 같은 목록은 홈 섹션의
+  최근글·인기글·뉴스 티커 위젯이 보여 줍니다. `g7-wc-community` 는 fork-20260926 부터 이 주소를 부르지 않습니다.
+- **공통 제외 설정 `excluded_board_ids` 는 더 이상 읽지 않습니다.** 설정 파일에 저장된 값은 지우지 않고 그대로
+  두며(되돌릴 때 그대로 쓰입니다), 설정 화면·설정 저장 API 도 이 키를 받지 않습니다(요청에 섞여 와도 무시).
+- **저장 안 된 칸의 기본값**: 0.4.x 에서는 게시판 선택을 저장하지 않은 목록 위젯 칸이 공통 제외 목록을 "포함 안
+  함" 기본값으로 썼습니다. 0.5.0 에서는 그런 칸이 **모든 게시판을 포함**합니다. 홈 화면 설정을 한 번이라도
+  저장했다면 보이는 칸은 모두 자기 선택을 갖고 있어 바뀌지 않습니다. 나중에 1단 섹션을 2단으로 바꾸면 새 칸은
+  "모두 포함"으로 열리므로, 빼고 싶은 게시판을 그 칸에서 직접 고르세요.
+- 확인 방법: 설정 파일(`storage/app/plugins/g7-home-widgets/settings/setting.json`)의 `home_layout` 에서 보이는
+  칸마다 `boards` 가 있는지 보면 됩니다. 없거나 `null` 인 칸은 0.5.0 에서 모든 게시판을 보여 줍니다.
 
 ## 요구 사항
 
@@ -138,7 +132,7 @@ php artisan plugin:activate g7-home-widgets
 - 이전 버전에서 업데이트하면 홈 섹션은 기본값(0.3.0 홈 모양)으로 바로 나타납니다. 설정 파일은 고쳐 쓰지 않습니다.
 - 업데이트 뒤 훅 리스너가 한 번 늦게 반영될 수 있습니다(업데이트 명령 안에서 옛 플러그인 클래스가 먼저 올라와
   있기 때문). 같은 패키지로 `plugin:update` 를 한 번 더 하면 확실합니다. 관리자 메뉴 이름("홈 화면 설정")도
-  이때 반영됩니다.
+  이때 반영됩니다. 0.4.x → 0.5.0 은 훅 리스너 구성이 같아 한 번이면 됩니다.
 - 설정 화면이 안 보이면 `php artisan plugin:refresh-layout g7-home-widgets` 로 레이아웃을 새로 등록합니다.
 - 라우트를 캐시하는 사이트에서 새 라우트가 안 보이면:
 
@@ -147,60 +141,21 @@ php artisan plugin:cache-clear
 php artisan route:clear && php artisan route:cache
 ```
 
-## 0.3.0 으로 되돌리기(원복)
+## 되돌리기(원복)
 
-- 0.3.0 패키지로 `plugin:update` 하면 홈 섹션이 사라지고 템플릿 홈 위젯만 남습니다. 옛 위젯 API 3종은 두 버전이
-  같습니다.
-- **남는 흔적**: 홈 overlay 레이아웃 확장 행은 DB 에 남습니다. 그래서 홈 방문마다 없어진
-  `/api/plugins/g7-home-widgets/home` 을 한 번 더 부르고 404 가 납니다(화면·토스트 변화 없음). 0.4.0 으로 다시
-  올리면 같은 행을 다시 씁니다.
-- 설정 파일의 `home_layout` 키는 남고(0.3.0 은 읽지 않음), 다시 0.4.0 으로 올리면 그대로 쓰입니다.
-  `excluded_board_ids` 는 두 버전이 같은 뜻으로 씁니다.
+- **0.5.0 → 0.4.2**: 0.4.2 패키지로 `plugin:update` 하면 없어졌던 API 가 다시 생기고, 설정 파일에 남아 있던
+  `excluded_board_ids` 값을 0.4.2 가 다시 읽어 업데이트 전과 같게 동작합니다(0.5.0 은 그 값을 지우지 않습니다).
+- **0.4.x → 0.3.0**: 홈 섹션이 사라지고 템플릿 홈 위젯만 남습니다. 홈 overlay 레이아웃 확장 행은 DB 에 남아 홈
+  방문마다 없어진 `/api/plugins/g7-home-widgets/home` 을 한 번 더 부르고 404 가 납니다(화면·토스트 변화 없음).
+  설정 파일의 `home_layout` 키는 남고(0.3.0 은 읽지 않음), 다시 올리면 그대로 쓰입니다.
 - g7-webzine-addon 을 1.2.0 이하로 되돌리면 공개 계약이 없어지므로 홈의 웹진 칸은 최근글로 대신 보입니다(오류 없음).
-
-## 템플릿에서 옛 위젯 API 쓰기
-
-플러그인은 데이터만 줍니다. 사용자 템플릿 레이아웃 JSON 에 데이터 소스로 연결하세요. 로그인 사용자의 토큰을
-함께 보내면(`auth_mode: "optional"`) 회원은 비회원이 못 보는 게시판도 봅니다:
-
-```json
-{
-  "id": "home_popular_posts",
-  "type": "api",
-  "endpoint": "/api/plugins/g7-home-widgets/popular-posts",
-  "method": "GET",
-  "params": { "period": "{{_local.homePopularPeriod ?? 'week'}}", "limit": 10 },
-  "auto_fetch": true,
-  "auth_mode": "optional",
-  "fallback": { "data": [] }
-}
-```
-
-공지 티커는 공지 게시판 slug 로 `notice-posts` 를 부릅니다. `g7-wc-community` 템플릿은 `NoticeTicker`
-컴포넌트로 그립니다:
-
-```json
-{
-  "id": "home_notice_posts",
-  "type": "api",
-  "endpoint": "/api/plugins/g7-home-widgets/notice-posts",
-  "method": "GET",
-  "params": { "board": "notice", "limit": 5 },
-  "auto_fetch": true,
-  "auth_mode": "optional",
-  "fallback": { "data": [] }
-}
-```
-
-인기글 기간을 페이지 이동 없이 바꾸려면 로컬 상태를 바꾸고 다시 불러옵니다:
-`sequence[ setState(local, homePopularPeriod) → refetchDataSource(home_popular_posts) ]`.
 
 ## 제거
 
-DB 테이블은 없습니다. 설정(`excluded_board_ids`, `home_layout`)은 플러그인 설정 파일에 있습니다.
+DB 테이블은 없습니다. 설정(`home_layout`, 0.4.x 에서 남은 값이 있으면 그것도)은 플러그인 설정 파일에 있습니다.
 **관리자 → 플러그인**에서 비활성화·제거하거나 `php artisan plugin:uninstall g7-home-widgets` 를 쓰고, 템플릿에서
 이 플러그인 주소를 부르는 데이터 소스를 지우세요. 홈 overlay 레이아웃 확장 행은 제거 뒤에도 DB 에 남을 수
-있습니다(그 경우 홈 방문마다 `/home` 404 요청 1회 — "0.3.0 으로 되돌리기"와 같은 흔적).
+있습니다(그 경우 홈 방문마다 `/home` 404 요청 1회 — "되돌리기"의 0.3.0 항목과 같은 흔적).
 
 ## 라이선스
 
@@ -210,7 +165,7 @@ MIT — [LICENSE](./LICENSE) 참고.
 
 A Gnuboard7 plugin for home pages built on `sirsoft-board`.
 
-- **0.4.0 home sections**: five sections (each on/off, one or two columns); each column shows recent
+- **Home sections**: five sections (each on/off, one or two columns); each column shows recent
   posts, popular posts, a news ticker, a gallery, a webzine-style list (needs
   [g7-webzine-addon](https://github.com/William1607cho/g7-webzine-addon) 1.3.0+) or admin-written
   HTML. Set it in **Admin → Home Page Settings**: per-column widget type, title, icon, item count
@@ -218,8 +173,11 @@ A Gnuboard7 plugin for home pages built on `sirsoft-board`.
   secret posts are left to `sirsoft-board`; template files are not modified.
 - Without the webzine add-on, webzine columns are drawn as recent posts (keeping their title, icon,
   count and boards) and the admin screen marks the type "(add-on required)".
-- **Legacy APIs kept**: `recent-posts`, `popular-posts`, `notice-posts` and the `excluded_board_ids`
-  setting, used by template home widgets.
-- **Updating**: run `plugin:update` twice with the same package so the new hook listeners take effect.
+- **0.5.0 removes legacy parts**: the `recent-posts`, `popular-posts` and `notice-posts` APIs and the
+  `admin/board-filter` API now return 404, and the `excluded_board_ids` setting is no longer read (the
+  stored value is left untouched, so rolling back to 0.4.2 restores the old behaviour). A column with
+  no saved board choice now includes every board; columns you have saved keep their own choice.
+- **Updating**: 0.4.x → 0.5.0 needs one `plugin:update` (hook listeners are unchanged). Earlier
+  upgrades that added listeners needed a second run with the same package.
 - **Rolling back to 0.3.0** removes the sections; the home overlay row stays, so each home visit makes
   one extra request that returns 404 (no visible change).
